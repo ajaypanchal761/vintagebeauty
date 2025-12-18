@@ -1,0 +1,19 @@
+{
+  "name": "Vintage Beauty - Perfume & Beauty Products",
+  "short_name": "Vintage Beauty",
+  "description": "Premium perfumes and beauty products",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#D4AF37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "scope": "/",
+  "lang": "en"
+}
