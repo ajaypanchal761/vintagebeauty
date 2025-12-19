@@ -18,7 +18,7 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { getItemCount, addItem } = useCartStore();
-  const [activeCategory, setActiveCategory] = useState('Perfume');
+  const [activeCategory, setActiveCategory] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cartCount = getItemCount();
 
@@ -33,11 +33,12 @@ const Home = () => {
 
   const activeNavTab = getActiveNavTab();
 
-  const categoryNames = ['Perfume', 'Room Spray', 'Pocket Perfume', 'After Shave', 'Gift Set'];
-  
-  // State for categories from API
+  // State for categories from API (now used for navigation)
   const [categoriesData, setCategoriesData] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Get category names from API data or fallback to empty array
+  const categoryNames = categoriesData.map(cat => cat.name) || [];
   
   // State for products
   const [products, setProducts] = useState([]);
@@ -67,15 +68,29 @@ const Home = () => {
 
   // Map category name to category slug/ID for API - memoized for performance
   const getCategorySlug = useCallback((categoryName) => {
-    const categoryMap = {
-      'Perfume': 'perfume',
-      'Room Spray': 'room-spray',
-      'Pocket Perfume': 'pocket-perfume',
-      'After Shave': 'after-shave',
-      'Gift Set': 'gift-set'
-    };
-    return categoryMap[categoryName] || 'perfume';
-  }, []);
+    // Handle null/undefined categoryName
+    if (!categoryName) {
+      return 'perfume'; // Default fallback
+    }
+
+    if (!categoriesData || categoriesData.length === 0) {
+      // Fallback to hardcoded mapping if categories not loaded yet
+      const fallbackMap = {
+        'Perfume': 'perfume',
+        'Room Spray': 'room-spray',
+        'Pocket Perfume': 'pocket-perfume',
+        'After Shave': 'after-shave',
+        'Gift Set': 'gift-set'
+      };
+      return fallbackMap[categoryName] || categoryName.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    // Find category by name and return its slug
+    const category = categoriesData.find(cat =>
+      cat.name && cat.name.toLowerCase() === categoryName.toLowerCase()
+    );
+    return category?.slug || categoryName.toLowerCase().replace(/\s+/g, '-');
+  }, [categoriesData]);
 
   // Process products data
   const processProducts = useCallback((productsArray) => {
@@ -127,6 +142,9 @@ const Home = () => {
 
   // Fetch products based on active category - ONLY from database
   useEffect(() => {
+    // Don't fetch if activeCategory is null
+    if (!activeCategory) return;
+
     const fetchProducts = async () => {
       // Check cache first - instant load if available
       if (productsCache[activeCategory]) {
@@ -134,7 +152,7 @@ const Home = () => {
         setLoadingProducts(false);
         return;
       }
-      
+
       setLoadingProducts(true);
       try {
         const categorySlug = getCategorySlug(activeCategory);
@@ -192,18 +210,27 @@ const Home = () => {
     fetchCategories();
   }, []);
 
+  // Set initial active category when categories are loaded
+  useEffect(() => {
+    if (categoriesData.length > 0 && !activeCategory) {
+      setActiveCategory(categoriesData[0].name);
+    }
+  }, [categoriesData, activeCategory]);
+
   // Prefetch all other categories in background after initial load
   useEffect(() => {
     // Wait a bit after initial load, then prefetch other categories
-    const timer = setTimeout(() => {
-      categoryNames.forEach(category => {
-        if (category !== activeCategory && !productsCache[category]) {
-          prefetchCategoryProducts(category);
-        }
-      });
-    }, 1000); // Start prefetching after 1 second
+    if (categoryNames.length > 0) {
+      const timer = setTimeout(() => {
+        categoryNames.forEach(category => {
+          if (category !== activeCategory && !productsCache[category]) {
+            prefetchCategoryProducts(category);
+          }
+        });
+      }, 1000); // Start prefetching after 1 second
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, [activeCategory, categoryNames, productsCache, prefetchCategoryProducts]);
 
   // Fetch active promotional announcements for home page
@@ -604,20 +631,20 @@ const Home = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
-          <div className="flex items-center justify-between">
-            {/* Hamburger Menu */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
-              aria-label="Menu"
-            >
-              <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+          <div className="flex items-center justify-between lg:relative lg:flex lg:items-center">
+            {/* Hamburger Menu + Logo/Brand Name - Left Section */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+                aria-label="Menu"
+              >
+                <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
 
-            {/* Logo/Brand Name */}
-            <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
               {logo && (
                 <img 
                   src={logo} 
@@ -625,13 +652,14 @@ const Home = () => {
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
-                VINTAGE BEAUTY
-              </h1>
+                <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+                  VINTAGE BEAUTY
+                </h1>
+              </div>
             </div>
 
             {/* Navigation Links - Desktop Only */}
-            <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
               <Link
                 to="/"
                 className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
@@ -689,7 +717,7 @@ const Home = () => {
             {/* Shopping Bag Icon */}
             <motion.button
               onClick={() => navigate('/cart')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative"
+              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative lg:absolute lg:right-0"
               aria-label="Shopping Cart"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -798,46 +826,60 @@ const Home = () => {
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center gap-6 md:gap-8 py-3 md:py-4 min-w-max md:min-w-0">
-            {categoryNames.map((category, index) => (
-              <motion.button
-                key={category}
-                onClick={() => {
-                  setActiveCategory(category);
-                  
-                  // Track category visit
-                  trackCategoryVisit(category);
-                  
-                  // If cached, show immediately
-                  if (productsCache[category]) {
-                    setProducts(productsCache[category]);
-                    setLoadingProducts(false);
-                  }
-                  // Scroll to products section
-                  setTimeout(() => {
-                    const productsSection = document.getElementById('products-section');
-                    if (productsSection) {
-                      productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            {loadingCategories ? (
+              // Loading state for categories
+              <div className="flex items-center gap-6 md:gap-8">
+                {[...Array(5)].map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="h-4 bg-gray-700 rounded w-20"></div>
+                  </div>
+                ))}
+              </div>
+            ) : categoryNames.length > 0 ? (
+              categoryNames.map((category, index) => (
+                <motion.button
+                  key={category}
+                  onClick={() => {
+                    setActiveCategory(category);
+
+                    // Track category visit
+                    trackCategoryVisit(category);
+
+                    // If cached, show immediately
+                    if (productsCache[category]) {
+                      setProducts(productsCache[category]);
+                      setLoadingProducts(false);
                     }
-                  }, 50);
-                }}
-                onMouseEnter={() => {
-                  // Aggressive prefetch on hover - start immediately
-                  prefetchCategoryProducts(category);
-                }}
-                className={`text-sm md:text-base font-medium whitespace-nowrap transition-colors pb-2 border-b-2 ${
-                  activeCategory === category
-                    ? 'text-white border-[#D4AF37] font-semibold'
-                    : 'text-white border-transparent hover:text-[#D4AF37]'
-                }`}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 * index }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {category}
-              </motion.button>
-            ))}
+                    // Scroll to products section
+                    setTimeout(() => {
+                      const productsSection = document.getElementById('products-section');
+                      if (productsSection) {
+                        productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }, 50);
+                  }}
+                  onMouseEnter={() => {
+                    // Aggressive prefetch on hover - start immediately
+                    prefetchCategoryProducts(category);
+                  }}
+                  className={`text-sm md:text-base font-medium whitespace-nowrap transition-colors pb-2 border-b-2 ${
+                    activeCategory === category
+                      ? 'text-white border-[#D4AF37] font-semibold'
+                      : 'text-white border-transparent hover:text-[#D4AF37]'
+                  }`}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 * index }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {category}
+                </motion.button>
+              ))
+            ) : (
+              // Fallback if no categories loaded
+              <div className="text-gray-400 text-sm">No categories available</div>
+            )}
           </div>
         </div>
       </motion.div>

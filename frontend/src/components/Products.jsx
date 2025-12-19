@@ -10,6 +10,7 @@ import BottomNavbar from './BottomNavbar';
 import logo from '../assets/logo vintage.png';
 import heroimg from '../assets/heroimg.png';
 import { trackCategoryVisit, trackProductView } from '../utils/activityTracker';
+import categoryService from '../services/categoryService';
 
 const Products = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Products = () => {
   const { toggleItem, isInWishlist } = useWishlistStore();
   const { addItem, getItemCount } = useCartStore();
   const cartCount = getItemCount();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Get active navigation tab
   const getActiveNavTab = () => {
@@ -33,21 +35,54 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // State for categories from API
+  const [categoriesData, setCategoriesData] = useState([]);
   
-  // State for selected category - initialize from URL query params
-  const [selectedCategory, setSelectedCategory] = useState(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const category = searchParams.get('category');
-    if (category) {
-      // Convert category slug to display name
-      const categoryMap = {
+  // Function to convert slug to category name
+  const getCategoryNameFromSlug = (slug) => {
+    if (!categoriesData || categoriesData.length === 0) {
+      // Fallback to hardcoded mapping if categories not loaded yet
+      const fallbackMap = {
         'perfume': 'Perfume',
         'room-spray': 'Room Spray',
         'pocket-perfume': 'Pocket Perfume',
         'after-shave': 'After Shave',
         'gift-set': 'Gift Set'
       };
-      return categoryMap[category] || category;
+      return fallbackMap[slug] || slug;
+    }
+
+    // Find category by slug and return its name
+    const category = categoriesData.find(cat => cat.slug === slug);
+    return category?.name || slug;
+  };
+
+  // Function to convert category name to slug
+  const getCategorySlugFromName = (categoryName) => {
+    if (!categoriesData || categoriesData.length === 0) {
+      // Fallback to hardcoded mapping if categories not loaded yet
+      const fallbackMap = {
+        'Perfume': 'perfume',
+        'Room Spray': 'room-spray',
+        'Pocket Perfume': 'pocket-perfume',
+        'After Shave': 'after-shave',
+        'Gift Set': 'gift-set'
+      };
+      return fallbackMap[categoryName] || categoryName.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    // Find category by name and return its slug
+    const category = categoriesData.find(cat => cat.name === categoryName);
+    return category?.slug || categoryName.toLowerCase().replace(/\s+/g, '-');
+  };
+
+  // State for selected category - initialize from URL query params
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const category = searchParams.get('category');
+    if (category) {
+      return getCategoryNameFromSlug(category);
     }
     return null;
   });
@@ -58,8 +93,17 @@ const Products = () => {
       setLoading(true);
       setError(null);
       try {
-        // Use centralized API - fetch all products from database
-        const response = await productsService.getAll();
+        // Prepare filters for API call
+        const filters = {};
+
+        // Add category filter if a category is selected
+        if (selectedCategory) {
+          const categorySlug = getCategorySlugFromName(selectedCategory);
+          filters.category = categorySlug;
+        }
+
+        // Use centralized API - fetch products from database with filters
+        const response = await productsService.getAll(filters);
         if (response.success) {
           // Process products to format prices and images
           const processedProducts = (response.products || response.data || []).map((product) => {
@@ -105,7 +149,38 @@ const Products = () => {
     };
 
     fetchProducts();
+  }, [selectedCategory]);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoryService.getCategories();
+        if (response.success && response.categories) {
+          setCategoriesData(response.categories);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategoriesData([]);
+      }
+    };
+
+    fetchCategories();
   }, []);
+
+  // Update selectedCategory when categories load and there's a category in URL
+  useEffect(() => {
+    if (categoriesData.length > 0) {
+      const searchParams = new URLSearchParams(location.search);
+      const category = searchParams.get('category');
+      if (category && !selectedCategory) {
+        const categoryName = getCategoryNameFromSlug(category);
+        if (categoryName !== category) { // Only update if we found a match
+          setSelectedCategory(categoryName);
+        }
+      }
+    }
+  }, [categoriesData, location.search, selectedCategory]);
 
   // Track category visit when category is selected from URL
   useEffect(() => {
@@ -239,9 +314,20 @@ const Products = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo/Brand Name */}
-            <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center justify-between lg:relative lg:flex lg:items-center">
+            {/* Hamburger Menu + Logo/Brand Name - Left Section */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+                aria-label="Menu"
+              >
+                <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+
+              <div className="flex items-center gap-2 md:gap-3">
               {logo && (
                 <img 
                   src={logo} 
@@ -249,13 +335,14 @@ const Products = () => {
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
-                VINTAGE BEAUTY
-              </h1>
+                <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+                  VINTAGE BEAUTY
+                </h1>
+              </div>
             </div>
 
             {/* Navigation Links - Desktop Only */}
-            <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
               <Link
                 to="/"
                 className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
@@ -313,7 +400,7 @@ const Products = () => {
             {/* Shopping Bag Icon */}
             <motion.button
               onClick={() => navigate('/cart')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative"
+              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative lg:absolute lg:right-0"
               aria-label="Shopping Cart"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
