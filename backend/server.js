@@ -30,14 +30,12 @@ app.use(cors({
   origin: [
     "https://vintagebeauty-luqb.vercel.app",
     "https://vintagebeauty.vercel.app",
-    "https://vintagebeauty.co.in/",
-    "https://www.vintagebeauty.co.in/",
+    "https://vintagebeauty.co.in",
+    "https://www.vintagebeauty.co.in",
     // Allow localhost for development
     ...(process.env.NODE_ENV !== 'production' ? [
       'http://localhost:5173',
-      'http://localhost:5174',
-      'https://vintagebeauty.co.in/',
-      'https://www.vintagebeauty.co.in/'
+      'http://localhost:5174'
     ] : [])
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -50,6 +48,8 @@ const io = new Server(httpServer, {
     origin: [
       "https://vintagebeauty-luqb.vercel.app",
       "https://vintagebeauty.vercel.app",
+      "https://vintagebeauty.co.in",
+      "https://www.vintagebeauty.co.in",
       // Allow localhost for development
       ...(process.env.NODE_ENV !== 'production' ? [
         'http://localhost:5173',

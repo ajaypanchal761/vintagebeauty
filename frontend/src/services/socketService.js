@@ -13,8 +13,26 @@ class SocketService {
     }
 
     // Extract base URL without /api suffix for Socket.IO (Socket.IO connects to server root)
-    const baseURL = API_CONFIG.baseURL.replace('/api', '');
-    const backendUrl = baseURL || 'https://vintagebeauty-1.onrender.com';
+    let baseURL = API_CONFIG.baseURL;
+    
+    // Validate and clean the baseURL
+    if (!baseURL || typeof baseURL !== 'string') {
+      baseURL = 'https://vintagebeauty-1.onrender.com/api';
+    }
+    
+    // Remove /api suffix if present
+    baseURL = baseURL.replace(/\/api\/?$/, '');
+    
+    // Ensure it's a valid URL (starts with http:// or https://)
+    if (!baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
+      console.error('Invalid backend URL for Socket.IO:', baseURL);
+      baseURL = 'https://vintagebeauty-1.onrender.com';
+    }
+    
+    // Remove trailing slash
+    baseURL = baseURL.replace(/\/$/, '');
+    
+    const backendUrl = baseURL;
     
     // Log connection attempt only in development (and only once)
     if (import.meta.env.DEV && !this._connectionLogged) {
