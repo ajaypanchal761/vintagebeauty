@@ -368,6 +368,16 @@ exports.createProduct = async (req, res, next) => {
       }
     }
 
+    // Handle sizes array if sent as JSON string
+    if (productData.sizes && typeof productData.sizes === 'string') {
+      try {
+        productData.sizes = JSON.parse(productData.sizes);
+      } catch (error) {
+        console.error('Error parsing sizes JSON:', error);
+        productData.sizes = [];
+      }
+    }
+
     // Convert string fields to proper types
     if (productData.price) productData.price = parseFloat(productData.price);
     if (productData.regularPrice) productData.regularPrice = parseFloat(productData.regularPrice);
@@ -508,6 +518,16 @@ exports.updateProduct = async (req, res, next) => {
         req.body.slug = `${nameSlug}-${categorySlug}`;
       } else {
         req.body.slug = nameSlug;
+      }
+    }
+
+    // Handle sizes array if sent as JSON string
+    if (req.body.sizes && typeof req.body.sizes === 'string') {
+      try {
+        req.body.sizes = JSON.parse(req.body.sizes);
+      } catch (error) {
+        console.error('Error parsing sizes JSON:', error);
+        req.body.sizes = [];
       }
     }
 

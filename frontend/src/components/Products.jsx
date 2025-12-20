@@ -554,10 +554,32 @@ const Products = () => {
                         <p className="text-xs text-gray-400 line-clamp-2 mb-2">
                           {product.description}
                         </p>
+
+                        {/* Available Sizes */}
+                        {product.sizes && product.sizes.length > 0 && (
+                          <div className="mb-2">
+                            <div className="flex flex-wrap gap-1">
+                              {product.sizes.slice(0, 3).map((size, idx) => (
+                                <span
+                                  key={idx}
+                                  className="text-[10px] px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded border border-gray-600"
+                                >
+                                  {size.size}
+                                </span>
+                              ))}
+                              {product.sizes.length > 3 && (
+                                <span className="text-[10px] px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded border border-gray-600">
+                                  +{product.sizes.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {isOutOfStock && (
                           <p className="text-xs font-semibold text-red-400 mb-1">Out of Stock</p>
                         )}
-                        
+
                         {/* Add to Cart Button */}
                         <button 
                           onClick={(e) => handleAddToCart(product, e)}

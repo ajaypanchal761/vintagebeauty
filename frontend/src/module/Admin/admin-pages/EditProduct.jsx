@@ -15,13 +15,13 @@ const EditProduct = () => {
     name: "",
     material: "",
     description: "",
-    size: "",
     colour: "",
     category: "",
     utility: "",
     care: "",
     price: "",
     regularPrice: "",
+    sizes: [],
     inStock: true,
     isBestSeller: false,
     isFeatured: false,
@@ -86,6 +86,7 @@ const EditProduct = () => {
               category: categoryId,
               price: prod.price?.toString() || "",
               regularPrice: prod.regularPrice?.toString() || "",
+              sizes: Array.isArray(prod.sizes) ? prod.sizes.filter(s => s && (typeof s === 'object' ? s.size : s)) : [],
               inStock: !!prod.inStock,
               isBestSeller: !!prod.isBestSeller,
               isFeatured: !!prod.isFeatured,
@@ -176,6 +177,30 @@ const EditProduct = () => {
     setDragOver(prev => ({ ...prev, [fieldName]: false }));
   };
 
+  // Sizes management functions
+  const addSize = () => {
+    setProduct(prev => ({
+      ...prev,
+      sizes: [...prev.sizes, { size: "", price: "" }]
+    }));
+  };
+
+  const updateSize = (index, field, value) => {
+    setProduct(prev => ({
+      ...prev,
+      sizes: prev.sizes.map((size, i) =>
+        i === index ? { ...size, [field]: value } : size
+      )
+    }));
+  };
+
+  const removeSize = (index) => {
+    setProduct(prev => ({
+      ...prev,
+      sizes: prev.sizes.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -186,13 +211,10 @@ const EditProduct = () => {
         "name",
         "material",
         "description",
-        "size",
         "colour",
         "category",
         "utility",
-        "care",
-        "price",
-        "regularPrice"
+        "care"
       ];
 
       const missingFields = requiredFields.filter(field => !product[field]);
@@ -237,7 +259,12 @@ const EditProduct = () => {
       // Add all product fields to FormData
       Object.keys(product).forEach(key => {
         if (product[key] !== undefined && product[key] !== null) {
-          formData.append(key, product[key]);
+          if (key === 'sizes') {
+            // Send sizes as JSON string
+            formData.append('sizes', JSON.stringify(product.sizes));
+          } else {
+            formData.append(key, product[key]);
+          }
         }
       });
 
@@ -465,17 +492,52 @@ const EditProduct = () => {
                     </div>
                   )}
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Size/Volume *</label>
-                    <input
-                      type="text"
-                      name="size"
-                      value={product.size}
-                      onChange={handleChange}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      required
-                      placeholder="e.g., 50ml, 100ml"
-                    />
+                  {/* Sizes Management */}
+                  <div className="md:col-span-2">
+                    <label className="block font-medium text-gray-700 mb-3">Product Sizes & Prices</label>
+                    <div className="space-y-3">
+                      {product.sizes.map((size, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 bg-white border border-gray-300 rounded-lg">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              placeholder="Size (e.g., 50ml)"
+                              value={size.size}
+                              onChange={(e) => updateSize(index, 'size', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-500"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <input
+                              type="number"
+                              placeholder="Price (₹)"
+                              value={size.price}
+                              onChange={(e) => updateSize(index, 'price', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-500"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeSize(index)}
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addSize}
+                        className="flex items-center gap-2 px-4 py-2 text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        <span className="text-sm font-medium">+ Add Size</span>
+                      </button>
+                    </div>
+                    {product.sizes.length === 0 && (
+                      <p className="text-sm text-gray-500 mt-2">Add at least one size variant for your product</p>
+                    )}
                   </div>
 
                   <div>
