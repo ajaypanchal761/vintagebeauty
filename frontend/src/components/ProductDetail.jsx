@@ -326,20 +326,21 @@ const ProductDetail = () => {
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
-          <div className="flex items-center justify-between">
-            {/* Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
-              aria-label="Back"
-            >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            {/* Logo/Brand Name */}
+          <div className="flex items-center justify-between lg:relative lg:flex lg:items-center">
+            {/* Mobile Back Button + Logo/Brand Name - Left Section */}
             <div className="flex items-center gap-2 md:gap-3">
+              {/* Back Button - Mobile Only */}
+              <button
+                onClick={() => navigate(-1)}
+                className="md:hidden p-2 hover:bg-gray-900 rounded-lg transition-colors"
+                aria-label="Back"
+              >
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              {/* Logo/Brand Name */}
               {logo && (
                 <img
                   src={logo}
@@ -352,8 +353,8 @@ const ProductDetail = () => {
               </h1>
             </div>
 
-            {/* Navigation Links - Desktop Only */}
-            <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            {/* Navigation Links - Desktop Only - Centered */}
+            <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
               <Link
                 to="/"
                 className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Home'
