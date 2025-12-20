@@ -7,10 +7,12 @@ import { products as productsService } from '../api';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useCartStore } from '../store/cartStore';
 import BottomNavbar from './BottomNavbar';
+import LazyImage from './LazyImage';
 import logo from '../assets/logo vintage.png';
 import heroimg from '../assets/heroimg.png';
 import { trackCategoryVisit, trackProductView } from '../utils/activityTracker';
 import categoryService from '../services/categoryService';
+import { preloadProductImages } from '../utils/imagePreloader';
 
 const Products = () => {
   const navigate = useNavigate();
@@ -130,6 +132,9 @@ const Products = () => {
             };
           });
           setProducts(processedProducts);
+
+          // Preload first few product images for better performance
+          preloadProductImages(processedProducts, 6);
         }
       } catch (err) {
         console.error('Error fetching products:', err);
@@ -475,7 +480,7 @@ const Products = () => {
                 const inWishlist = isInWishlist(productId);
                 const stockValue = Number(product?.stock);
                 const isOutOfStock = product?.inStock === false || (Number.isFinite(stockValue) && stockValue <= 0);
-                
+
                 return (
                   <motion.div
                     key={productId || index}
@@ -490,13 +495,11 @@ const Products = () => {
                     >
                       {/* Product Image */}
                       <div className="relative h-36 md:h-48 lg:h-56 bg-gray-800 overflow-hidden">
-                        <img
+                        <LazyImage
                           src={product.image || heroimg}
                           alt={product.name || 'Product'}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          onError={(e) => {
-                            e.target.src = heroimg;
-                          }}
+                          placeholder={heroimg}
                         />
                         
                         {/* Wishlist Heart Icon */}

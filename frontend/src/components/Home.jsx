@@ -1377,7 +1377,7 @@ const Home = () => {
             </div>
 
             {/* Category Shortcuts - Circular Icons */}
-            <div className="flex gap-3 justify-center overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-3 justify-start overflow-x-auto pb-2 pr-6 pl-2 scrollbar-hide">
               {categoriesData.map((category, index) => {
                 // Dynamic icons based on category name
                 const getCategoryIcon = (categoryName) => {

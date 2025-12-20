@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
@@ -7,33 +7,42 @@ import { useAuthStore } from './store/authStore'
 import { setNavigate } from './utils/navigationHelper'
 import Admin from './module/Admin/Admin'
 import Home from './components/Home'
-import Products from './components/Products'
-import ProductDetail from './components/ProductDetail'
-import Wishlist from './components/Wishlist'
-import Account from './components/Account'
-import Cart from './components/Cart'
-import OrderSummary from './components/OrderSummary'
-import Payment from './components/Payment'
-import OrderSuccess from './components/OrderSuccess'
-import Orders from './components/Orders'
-import Addresses from './components/Addresses'
-import Login from './components/Login'
-import Signup from './components/Signup'
-import FAQs from './components/FAQs'
-import PrivacyPolicy from './components/PrivacyPolicy'
-import TermsAndConditions from './components/TermsAndConditions'
-import RefundPolicy from './components/RefundPolicy'
-import AboutUs from './components/AboutUs'
-import Deals from './components/Deals'
-import ComboDeals from './components/ComboDeals'
-import Support from './components/Support'
-import MySupport from './components/MySupport'
 import NotificationListener from './components/NotificationListener'
 import UserProtectedRoute from './components/UserProtectedRoute'
-import Blogs from './components/Blogs'
-import BlogDetail from './components/BlogDetail'
-import TrackOrder from './components/TrackOrder'
 import './App.css'
+
+// Lazy load route components for better performance
+const Products = lazy(() => import('./components/Products'))
+const ProductDetail = lazy(() => import('./components/ProductDetail'))
+const Wishlist = lazy(() => import('./components/Wishlist'))
+const Account = lazy(() => import('./components/Account'))
+const Cart = lazy(() => import('./components/Cart'))
+const OrderSummary = lazy(() => import('./components/OrderSummary'))
+const Payment = lazy(() => import('./components/Payment'))
+const OrderSuccess = lazy(() => import('./components/OrderSuccess'))
+const Orders = lazy(() => import('./components/Orders'))
+const Addresses = lazy(() => import('./components/Addresses'))
+const Login = lazy(() => import('./components/Login'))
+const Signup = lazy(() => import('./components/Signup'))
+const FAQs = lazy(() => import('./components/FAQs'))
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'))
+const TermsAndConditions = lazy(() => import('./components/TermsAndConditions'))
+const RefundPolicy = lazy(() => import('./components/RefundPolicy'))
+const AboutUs = lazy(() => import('./components/AboutUs'))
+const Deals = lazy(() => import('./components/Deals'))
+const ComboDeals = lazy(() => import('./components/ComboDeals'))
+const Support = lazy(() => import('./components/Support'))
+const MySupport = lazy(() => import('./components/MySupport'))
+const Blogs = lazy(() => import('./components/Blogs'))
+const BlogDetail = lazy(() => import('./components/BlogDetail'))
+const TrackOrder = lazy(() => import('./components/TrackOrder'))
+
+// Loading component for Suspense fallback
+const PageLoading = () => (
+  <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D4AF37]"></div>
+  </div>
+);
 
 // Scroll to Top Component - Scrolls to top on route change
 function ScrollToTop() {
@@ -118,7 +127,8 @@ function AppRoutes() {
       <NotificationListener />
       <SmoothScroll>
         <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+          <Suspense fallback={<PageLoading />}>
+            <Routes location={location} key={location.pathname}>
             <Route path="/admin/*" element={<Admin />} />
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
@@ -146,7 +156,8 @@ function AppRoutes() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blog/:slug" element={<BlogDetail />} />
             <Route path="/track-order" element={<TrackOrder />} />
-          </Routes>
+            </Routes>
+          </Suspense>
         </AnimatePresence>
       </SmoothScroll>
       <Toaster position="top-center" />
