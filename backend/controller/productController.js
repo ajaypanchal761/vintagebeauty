@@ -30,13 +30,13 @@ exports.getProducts = async (req, res, next) => {
     if (category) {
       try {
         const categorySlug = category.toLowerCase();
-        
+
         // First, try to find category by slug (most common case)
-        let categoryDoc = await Category.findOne({ 
+        let categoryDoc = await Category.findOne({
           slug: categorySlug,
-          isActive: true 
+          isActive: true
         });
-        
+
         // If not found by slug, try to match by name (fallback for old data or direct name matching)
         if (!categoryDoc) {
           // Convert slug to name format: 'room-spray' -> 'Room Spray'
@@ -44,12 +44,12 @@ exports.getProducts = async (req, res, next) => {
             .split('-')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
-          categoryDoc = await Category.findOne({ 
+          categoryDoc = await Category.findOne({
             name: { $regex: new RegExp(`^${categoryName}$`, 'i') },
-            isActive: true 
+            isActive: true
           });
         }
-        
+
         if (categoryDoc) {
           // Use category ObjectId for filtering (works for ALL products - old and new)
           query.category = categoryDoc._id;
@@ -137,7 +137,7 @@ exports.getProducts = async (req, res, next) => {
 
     // Pagination
     const skip = (Number(page) - 1) * Number(limit);
-    
+
     const products = await Product.find(query)
       .populate('category', 'name slug')
       .sort(sortBy)
@@ -304,14 +304,14 @@ exports.createProduct = async (req, res, next) => {
     if (req.files) {
       try {
         const allFiles = [];
-        
+
         // Collect all uploaded files from different fields
         if (req.files.mainImage) allFiles.push(...req.files.mainImage);
         if (req.files.image1) allFiles.push(...req.files.image1);
         if (req.files.image2) allFiles.push(...req.files.image2);
         if (req.files.image3) allFiles.push(...req.files.image3);
         if (req.files.images) allFiles.push(...req.files.images); // Fallback for array upload
-        
+
         // Upload all images to Cloudinary directly from buffer (modern e-commerce approach)
         for (const file of allFiles) {
           const uploadResult = await new Promise((resolve, reject) => {
@@ -329,17 +329,17 @@ exports.createProduct = async (req, res, next) => {
                 else resolve(result);
               }
             );
-            
+
             // Convert buffer to stream and pipe to Cloudinary
             const bufferStream = new Readable();
             bufferStream.push(file.buffer);
             bufferStream.push(null);
             bufferStream.pipe(uploadStream);
           });
-          
+
           imageUrls.push(uploadResult.secure_url);
         }
-        
+
         if (imageUrls.length > 0) {
           productData.images = imageUrls;
         }
@@ -406,51 +406,72 @@ exports.updateProduct = async (req, res, next) => {
 
     // Handle images if uploaded - upload to Cloudinary
     // req.files is an object with field names as keys when using fields()
+    // Handle images if uploaded - upload to Cloudinary
+    // req.files is an object with field names as keys when using fields()
     if (req.files) {
       try {
-        const imageUrls = [];
-        const allFiles = [];
-        
-        // Collect all uploaded files from different fields
-        if (req.files.mainImage) allFiles.push(...req.files.mainImage);
-        if (req.files.image1) allFiles.push(...req.files.image1);
-        if (req.files.image2) allFiles.push(...req.files.image2);
-        if (req.files.image3) allFiles.push(...req.files.image3);
-        if (req.files.images) allFiles.push(...req.files.images); // Fallback for array upload
-        
-        // Upload all new images to Cloudinary directly from buffer (modern e-commerce approach)
-        for (const file of allFiles) {
-          const uploadResult = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-              {
-                folder: 'apm-beauty-products',
-                resource_type: 'image',
-                transformation: [
-                  { quality: 'auto' },
-                  { fetch_format: 'auto' }
-                ]
-              },
-              (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-              }
-            );
-            
-            // Convert buffer to stream and pipe to Cloudinary
-            const bufferStream = new Readable();
-            bufferStream.push(file.buffer);
-            bufferStream.push(null);
-            bufferStream.pipe(uploadStream);
-          });
-          
-          imageUrls.push(uploadResult.secure_url);
+        // Initialize with existing images or empty array
+        // We use a copy to avoid mutating the original product object immediately
+        const updatedImages = [...(product.images || [])];
+
+        // Define mapping from field name to array index
+        const fieldToIndex = {
+          'mainImage': 0,
+          'image1': 1,
+          'image2': 2,
+          'image3': 3
+        };
+
+        const fileFields = Object.keys(req.files);
+
+        for (const field of fileFields) {
+          // Skip if not one of our expected image fields (unless it's 'images' fallback)
+          if (!fieldToIndex.hasOwnProperty(field) && field !== 'images') continue;
+
+          const files = req.files[field]; // multers array of files
+          if (!files || files.length === 0) continue;
+
+          // Process each file (though usually 1 per field for named fields)
+          for (const file of files) {
+            const uploadResult = await new Promise((resolve, reject) => {
+              const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                  folder: 'apm-beauty-products',
+                  resource_type: 'image',
+                  transformation: [
+                    { quality: 'auto' },
+                    { fetch_format: 'auto' }
+                  ]
+                },
+                (error, result) => {
+                  if (error) reject(error);
+                  else resolve(result);
+                }
+              );
+
+              const bufferStream = new Readable();
+              bufferStream.push(file.buffer);
+              bufferStream.push(null);
+              bufferStream.pipe(uploadStream);
+            });
+
+            if (field === 'images') {
+              // If generic 'images' field used blocks, just push to end
+              updatedImages.push(uploadResult.secure_url);
+            } else {
+              // Map named field to specific index
+              const index = fieldToIndex[field];
+              updatedImages[index] = uploadResult.secure_url;
+            }
+          }
         }
-        
-        // If new images uploaded, replace existing images
-        // Otherwise keep existing images
-        if (imageUrls.length > 0) {
-          req.body.images = imageUrls;
-        }
+
+        // Update request body with merged images
+        // Filter out any potential empty slots if gaps were created (though unlikely with this logic if array was full)
+        // But we usually want to keep slots consistent. 
+        // Let's just assign the updated array.
+        req.body.images = updatedImages;
+
       } catch (uploadError) {
         console.error('Cloudinary upload error:', uploadError);
         return res.status(500).json({
@@ -480,7 +501,7 @@ exports.updateProduct = async (req, res, next) => {
     if (req.body.name || req.body.categoryName) {
       const productName = req.body.name || product.name;
       const categoryName = req.body.categoryName || product.categoryName;
-      
+
       const nameSlug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       if (categoryName) {
         const categorySlug = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

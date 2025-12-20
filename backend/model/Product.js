@@ -119,11 +119,11 @@ const productSchema = new mongoose.Schema({
 });
 
 // Generate slug before saving - includes category to allow same name in different categories
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function (next) {
   if (this.isModified('name') || this.isModified('categoryName') || this.isModified('category')) {
     // Generate base slug from product name
     const nameSlug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    
+
     // Include category name in slug if available (allows same product name in different categories)
     if (this.categoryName) {
       const categorySlug = this.categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -137,7 +137,7 @@ productSchema.pre('save', function(next) {
 });
 
 // Update inStock based on stock
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function (next) {
   this.inStock = this.stock > 0;
   next();
 });

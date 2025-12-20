@@ -51,6 +51,7 @@ const ProductDetail = () => {
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   // Fetch product by ID
   useEffect(() => {
@@ -65,7 +66,16 @@ const ProductDetail = () => {
         if (response.success && response.data) {
           const productData = response.data;
           setProduct(productData);
-          
+
+          // Set initial selected size
+          if (productData.sizes && productData.sizes.length > 0) {
+            // Default to index 2 (standard) if available, otherwise index 0
+            const defaultSize = productData.sizes[2] || productData.sizes[0];
+            if (defaultSize) {
+              setSelectedSize(defaultSize.size);
+            }
+          }
+
           // Track product view
           trackProductView(productData);
 
@@ -73,10 +83,10 @@ const ProductDetail = () => {
           if (productData.category) {
             try {
               // Get category slug from category object or categoryName
-              const categorySlug = productData.category?.slug || 
-                                   productData.categoryName?.toLowerCase().replace(/\s+/g, '-') ||
-                                   'perfume';
-              
+              const categorySlug = productData.category?.slug ||
+                productData.categoryName?.toLowerCase().replace(/\s+/g, '-') ||
+                'perfume';
+
               const relatedResponse = await products.getAll({
                 category: categorySlug,
                 limit: 5
@@ -108,6 +118,11 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
+  }, [id]);
+
+  // Reset active image on id change
+  useEffect(() => {
+    setActiveImageIndex(0);
   }, [id]);
 
   // Fetch reviews for the product
@@ -173,19 +188,24 @@ const ProductDetail = () => {
     );
   }
 
-  const productImage = product.images?.[0] || product.image || heroimg;
+  const productImages = product.images && product.images.length > 0
+    ? product.images
+    : [product.image || heroimg];
+
+  // Determine current size object based on selectedSize
+  const currentSizeObj = product.sizes?.find(s => s.size === selectedSize) ||
+    (product.sizes?.[2] || product.sizes?.[0]);
 
   let price = '';
-  if (product.price) {
+  if (currentSizeObj?.price) {
+    price = `₹${currentSizeObj.price}`;
+  } else if (product.price) {
     price = `₹${product.price}`;
-  } else if (product.sizes && product.sizes.length > 0) {
-    const priceSize = product.sizes[2] || product.sizes[0];
-    price = `₹${priceSize.price}`;
   } else {
     price = '₹699';
   }
 
-  const size = product.size || (product.sizes && product.sizes.length > 0 ? product.sizes[2]?.size || product.sizes[0]?.size : '100ml');
+  const size = selectedSize || currentSizeObj?.size || product.size || '100ml';
   const brandName = product.brandName || 'VINTAGE BEAUTY';
   const rating = product.rating || 0;
   const productId = product._id || product.id;
@@ -218,10 +238,10 @@ const ProductDetail = () => {
     const sizeValue = selectedSize || (product.sizes?.[2]?.size || product.sizes?.[0]?.size || '100ml');
     try {
       await addItem(product, quantity, sizeValue);
-      
+
       // Track add to cart activity
       trackAddToCart(product, quantity);
-      
+
       setToastMessage(`${product.name} added to cart!`);
       setShowToast(true);
     } catch (err) {
@@ -336,11 +356,10 @@ const ProductDetail = () => {
             <nav className="hidden md:flex items-center gap-6 lg:gap-8">
               <Link
                 to="/"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Home'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Home'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Home
                 {activeNavTab === 'Home' && (
@@ -349,11 +368,10 @@ const ProductDetail = () => {
               </Link>
               <Link
                 to="/products"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Shop All'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Shop All'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Shop All
                 {activeNavTab === 'Shop All' && (
@@ -362,11 +380,10 @@ const ProductDetail = () => {
               </Link>
               <Link
                 to="/deals"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Deals'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Deals'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Deals
                 {activeNavTab === 'Deals' && (
@@ -375,11 +392,10 @@ const ProductDetail = () => {
               </Link>
               <Link
                 to="/account"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Account'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Account'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Account
                 {activeNavTab === 'Account' && (
@@ -414,18 +430,70 @@ const ProductDetail = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <div className="flex justify-center items-center h-[400px] md:h-[500px] lg:h-[600px]">
-          <motion.img
-            src={productImage}
-            alt={product.name}
-            className="w-full max-w-xs md:max-w-md lg:max-w-lg h-full object-contain rounded-2xl md:rounded-3xl"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            onError={(e) => {
-              e.target.src = heroimg;
-            }}
-          />
+        <div className="flex flex-col items-center pb-8">
+          <div className="relative w-full flex justify-center items-center h-[400px] md:h-[500px] lg:h-[600px] mb-4">
+            {productImages.length > 1 && (
+              <button
+                onClick={() => setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1))}
+                className="absolute left-4 z-10 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors"
+                aria-label="Previous image"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+
+            <motion.img
+              key={activeImageIndex}
+              src={productImages[activeImageIndex]}
+              alt={product.name}
+              className="w-full max-w-xs md:max-w-md lg:max-w-lg h-full object-contain rounded-2xl md:rounded-3xl"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+              onError={(e) => {
+                e.target.src = heroimg;
+              }}
+            />
+
+            {productImages.length > 1 && (
+              <button
+                onClick={() => setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1))}
+                className="absolute right-4 z-10 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors"
+                aria-label="Next image"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          {productImages.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto px-4 w-full justify-center no-scrollbar py-2">
+              {productImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  className={`relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-300 ${activeImageIndex === idx
+                    ? 'ring-2 ring-[#D4AF37] scale-105 opacity-100'
+                    : 'opacity-50 hover:opacity-80 hover:scale-105'
+                    }`}
+                >
+                  <img
+                    src={img}
+                    alt={`View ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = heroimg;
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -466,6 +534,27 @@ const ProductDetail = () => {
               {price}
             </p>
           </div>
+
+          {/* Size Selector */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mb-6">
+              <p className="text-sm text-gray-300 mb-3">Select Size</p>
+              <div className="flex flex-wrap gap-3">
+                {product.sizes.map((s, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedSize(s.size)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border ${selectedSize === s.size
+                      ? 'bg-[#D4AF37] text-black border-[#D4AF37]'
+                      : 'bg-transparent text-white border-gray-600 hover:border-[#D4AF37] hover:text-[#D4AF37]'
+                      }`}
+                  >
+                    {s.size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Product Description */}
           <div className="mb-6 md:mb-8">
@@ -697,17 +786,16 @@ const ProductDetail = () => {
 
           <button
             onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className={`flex-1 font-bold px-4 py-3 rounded-lg text-sm transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${
-            isOutOfStock
+            disabled={isOutOfStock}
+            className={`flex-1 font-bold px-4 py-3 rounded-lg text-sm transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${isOutOfStock
               ? 'bg-gray-600 text-gray-200 cursor-not-allowed'
               : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black'
-          }`}
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-          <span>{isOutOfStock ? 'Out of stock' : 'Add to cart'}</span>
+            <span>{isOutOfStock ? 'Out of stock' : 'Add to cart'}</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -741,17 +829,16 @@ const ProductDetail = () => {
 
           <button
             onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className={`font-bold px-8 py-3 rounded-lg text-base transition-all duration-300 shadow-lg flex items-center justify-center gap-3 min-w-[200px] ${
-            isOutOfStock
+            disabled={isOutOfStock}
+            className={`font-bold px-8 py-3 rounded-lg text-base transition-all duration-300 shadow-lg flex items-center justify-center gap-3 min-w-[200px] ${isOutOfStock
               ? 'bg-gray-600 text-gray-200 cursor-not-allowed'
               : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black'
-          }`}
+              }`}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-          <span>{isOutOfStock ? 'Out of stock' : 'Add to cart'}</span>
+            <span>{isOutOfStock ? 'Out of stock' : 'Add to cart'}</span>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
