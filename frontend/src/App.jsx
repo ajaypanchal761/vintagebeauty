@@ -28,7 +28,6 @@ import Deals from './components/Deals'
 import ComboDeals from './components/ComboDeals'
 import Support from './components/Support'
 import MySupport from './components/MySupport'
-import Notifications from './components/Notifications'
 import NotificationListener from './components/NotificationListener'
 import UserProtectedRoute from './components/UserProtectedRoute'
 import Blogs from './components/Blogs'
@@ -133,7 +132,6 @@ function AppRoutes() {
             <Route path="/products/order-success" element={<UserProtectedRoute><OrderSuccess /></UserProtectedRoute>} />
             <Route path="/orders" element={<UserProtectedRoute><Orders /></UserProtectedRoute>} />
             <Route path="/addresses" element={<UserProtectedRoute><Addresses /></UserProtectedRoute>} />
-            <Route path="/notifications" element={<UserProtectedRoute><Notifications /></UserProtectedRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/faqs" element={<FAQs />} />

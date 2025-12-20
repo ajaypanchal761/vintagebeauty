@@ -443,7 +443,10 @@ const CouponManagement = () => {
                   Discount
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Uses
+                  Total Uses
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Unique Users
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Min Amount
@@ -462,7 +465,7 @@ const CouponManagement = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {coupons.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                     No coupons found. Click "Add New Coupon" to create one.
                   </td>
                 </tr>
@@ -484,6 +487,11 @@ const CouponManagement = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-900">
                           {coupon.usedCount || 0} / {coupon.usageLimit === 0 ? '∞' : (coupon.usageLimit || '∞')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">
+                          {coupon.uniqueUsers?.length || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

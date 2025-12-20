@@ -5,7 +5,9 @@ const Coupon = require('../model/Coupon');
 // @access  Private/Admin
 exports.getCoupons = async (req, res, next) => {
   try {
-    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    const coupons = await Coupon.find()
+      .populate('uniqueUsers', 'name email')
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,

@@ -1,6 +1,7 @@
 const Order = require('../model/Order');
 const Product = require('../model/Product');
 const Cart = require('../model/Cart');
+const Coupon = require('../model/Coupon');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -172,6 +173,14 @@ exports.createOrder = async (req, res, next) => {
     for (const item of orderItems) {
       await Product.findByIdAndUpdate(item.product || item.productId, {
         $inc: { stock: -item.quantity }
+      });
+    }
+
+    // Increment coupon usage count and track unique users if coupon was used
+    if (coupon && coupon._id) {
+      await Coupon.findByIdAndUpdate(coupon._id, {
+        $inc: { usedCount: 1 },
+        $addToSet: { uniqueUsers: req.user._id } // Add user to unique users array if not already present
       });
     }
 
@@ -485,6 +494,13 @@ exports.handleCancellationRequest = async (req, res, next) => {
       for (const item of order.orderItems) {
         await Product.findByIdAndUpdate(item.product, {
           $inc: { stock: item.quantity }
+        });
+      }
+
+      // Decrement coupon usage count if coupon was used
+      if (order.coupon && order.coupon._id) {
+        await Coupon.findByIdAndUpdate(order.coupon._id, {
+          $inc: { usedCount: -1 }
         });
       }
     } else if (action === 'reject') {

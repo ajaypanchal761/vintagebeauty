@@ -1334,7 +1334,7 @@ const Home = () => {
 
       {/* Sidebar Menu - Sliding from left */}
       <div className={`fixed left-0 top-0 h-full w-80 bg-black z-[9999] shadow-2xl transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col border-r border-gray-800`}>
-        <div className="overflow-y-auto flex-1">
+        <div className="overflow-y-auto flex-1 sidebar-scroll scroll-smooth">
           {/* Close Button */}
           <div className="flex justify-end p-4 border-b border-gray-800">
               <button
@@ -1377,56 +1377,73 @@ const Home = () => {
             </div>
 
             {/* Category Shortcuts - Circular Icons */}
-            <div className="flex gap-3 justify-center">
-              {/* PERFUMES */}
-              <button 
-                onClick={() => {
-                  setActiveCategory('Perfume');
-                  setIsMenuOpen(false);
-                }}
-                className="flex flex-col items-center"
-              >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center overflow-hidden shadow-md border-2 border-[#D4AF37]">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
-                <span className="text-xs font-bold text-white mt-1">PERFUMES</span>
-                <span className="text-[10px] text-gray-400">VINTAGE BEAUTY</span>
-              </button>
+            <div className="flex gap-3 justify-center overflow-x-auto pb-2 scrollbar-hide">
+              {categoriesData.map((category, index) => {
+                // Dynamic icons based on category name
+                const getCategoryIcon = (categoryName) => {
+                  const name = categoryName?.toLowerCase() || '';
+                  if (name.includes('perfume')) {
+                    return (
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                    );
+                  } else if (name.includes('room') || name.includes('spray')) {
+                    return (
+                      <svg className="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                    );
+                  } else if (name.includes('gift') || name.includes('set')) {
+                    return (
+                      <svg className="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                      </svg>
+                    );
+                  } else if (name.includes('after') || name.includes('shave')) {
+                    return (
+                      <svg className="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    );
+                  } else {
+                    // Default icon
+                    return (
+                      <svg className="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                      </svg>
+                    );
+                  }
+                };
 
-              {/* ROOM SPRAY */}
-              <button 
-                onClick={() => {
-                  setActiveCategory('Room Spray');
-                  setIsMenuOpen(false);
-                }}
-                className="flex flex-col items-center"
-              >
-                <div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center overflow-hidden shadow-md">
-                  <svg className="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                </div>
-                <span className="text-xs font-bold text-white mt-1">ROOM SPRAY</span>
-                <span className="text-[10px] text-gray-400">VINTAGE BEAUTY</span>
-              </button>
+                // Dynamic background based on index
+                const backgrounds = [
+                  'bg-gradient-to-br from-amber-400 to-amber-600',
+                  'bg-gray-800 border-2 border-gray-600',
+                  'bg-gray-900 border-2 border-[#D4AF37]',
+                  'bg-gradient-to-br from-purple-500 to-purple-700',
+                  'bg-gradient-to-br from-green-500 to-green-700',
+                  'bg-gradient-to-br from-blue-500 to-blue-700'
+                ];
 
-              {/* GIFT SET */}
-              <button 
-                onClick={() => {
-                  setActiveCategory('Gift Set');
-                  setIsMenuOpen(false);
-                }}
-                className="flex flex-col items-center"
-              >
-                <div className="w-16 h-16 rounded-full bg-gray-900 border-2 border-[#D4AF37] flex items-center justify-center overflow-hidden shadow-md">
-                  <svg className="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                  </svg>
-                </div>
-                <span className="text-xs font-bold text-white mt-1">GIFT SET</span>
-              </button>
+                return (
+                  <button
+                    key={category._id || category.id || index}
+                    onClick={() => {
+                      setActiveCategory(category.name);
+                      setIsMenuOpen(false);
+                      trackCategoryVisit(category.name);
+                    }}
+                    className="flex flex-col items-center"
+                  >
+                    <div className={`w-16 h-16 rounded-full ${backgrounds[index % backgrounds.length]} flex items-center justify-center overflow-hidden shadow-md ${index === 0 ? 'border-2 border-[#D4AF37]' : ''}`}>
+                      {getCategoryIcon(category.name)}
+                    </div>
+                    <span className="text-xs font-bold text-white mt-1">{category.name}</span>
+                    <span className="text-[10px] text-gray-400">VINTAGE BEAUTY</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -1465,91 +1482,72 @@ const Home = () => {
               </button>
             </div>
 
-            {/* PERFUMES */}
-            <button 
-              onClick={() => {
-                setActiveCategory('Perfume');
-                setIsMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
-            >
-              <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span className="flex-1 text-left text-sm font-semibold text-white">PERFUMES</span>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+            {/* Dynamic Categories */}
+            {categoriesData.map((category) => {
+              // Dynamic icons based on category name
+              const getCategoryIcon = (categoryName) => {
+                const name = categoryName?.toLowerCase() || '';
+                if (name.includes('perfume')) {
+                  return (
+                    <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  );
+                } else if (name.includes('room') || name.includes('spray')) {
+                  return (
+                    <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  );
+                } else if (name.includes('pocket')) {
+                  return (
+                    <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                  );
+                } else if (name.includes('after') || name.includes('shave')) {
+                  return (
+                    <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  );
+                } else if (name.includes('gift') || name.includes('set')) {
+                  return (
+                    <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                  );
+                } else {
+                  // Default category icon
+                  return (
+                    <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                  );
+                }
+              };
 
-            {/* ROOM SPRAY */}
-            <button 
-              onClick={() => {
-                setActiveCategory('Room Spray');
-                setIsMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
-            >
-              <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span className="flex-1 text-left text-sm font-semibold text-white">ROOM SPRAY</span>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            {/* POCKET PERFUME */}
-            <button 
-              onClick={() => {
-                setActiveCategory('Pocket Perfume');
-                setIsMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
-            >
-              <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-              <span className="flex-1 text-left text-sm font-semibold text-white">POCKET PERFUME</span>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            {/* AFTER SHAVE */}
-            <button 
-              onClick={() => {
-                setActiveCategory('After Shave');
-                setIsMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
-            >
-              <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-              <span className="flex-1 text-left text-sm font-semibold text-white">AFTER SHAVE</span>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            {/* GIFT SET */}
-            <button 
-              onClick={() => {
-                setActiveCategory('Gift Set');
-                setIsMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
-            >
-              <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-              </svg>
-              <span className="flex-1 text-left text-sm font-semibold text-white">GIFT SET</span>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+              return (
+                <button
+                  key={category._id || category.id}
+                  onClick={() => {
+                    setActiveCategory(category.name);
+                    setIsMenuOpen(false);
+                    trackCategoryVisit(category.name);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
+                >
+                  {getCategoryIcon(category.name)}
+                  <span className="flex-1 text-left text-sm font-semibold text-white">{category.name}</span>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              );
+            })}
           </div>
+          {/* Bottom padding for better scrolling */}
+          <div className="pb-8"></div>
           </div>
         </div>
 
