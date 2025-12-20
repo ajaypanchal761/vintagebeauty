@@ -18,7 +18,6 @@ const Products = () => {
   const { toggleItem, isInWishlist } = useWishlistStore();
   const { addItem, getItemCount } = useCartStore();
   const cartCount = getItemCount();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Get active navigation tab
   const getActiveNavTab = () => {
@@ -315,19 +314,8 @@ const Products = () => {
       >
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between lg:relative lg:flex lg:items-center">
-            {/* Hamburger Menu + Logo/Brand Name - Left Section */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
-                aria-label="Menu"
-              >
-                <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-
-              <div className="flex items-center gap-2 md:gap-3">
+            {/* Logo/Brand Name - Left Section */}
+            <div className="flex items-center gap-2 md:gap-3">
               {logo && (
                 <img 
                   src={logo} 
@@ -339,7 +327,6 @@ const Products = () => {
                   VINTAGE BEAUTY
                 </h1>
               </div>
-            </div>
 
             {/* Navigation Links - Desktop Only */}
             <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
