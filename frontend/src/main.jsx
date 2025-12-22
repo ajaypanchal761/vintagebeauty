@@ -48,7 +48,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {
-        console.log('[SW] Registered successfully:', registration.scope);
+       
 
         // Check for updates
         registration.addEventListener('updatefound', () => {
@@ -57,7 +57,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 // New version available
-                console.log('[SW] New version available, refreshing...');
+                
                 window.location.reload();
               }
             });
@@ -66,7 +66,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
 
         // Handle controller change (new SW activated)
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          console.log('[SW] Controller changed, reloading page');
+         
           window.location.reload();
         });
       })

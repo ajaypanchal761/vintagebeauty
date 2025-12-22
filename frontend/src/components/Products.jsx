@@ -95,7 +95,9 @@ const Products = () => {
       setError(null);
       try {
         // Prepare filters for API call
-        const filters = {};
+        const filters = {
+          limit: 1000 // Fetch all products for complete visibility
+        };
 
         // Add category filter if a category is selected
         if (selectedCategory) {
@@ -133,8 +135,8 @@ const Products = () => {
           });
           setProducts(processedProducts);
 
-          // Preload first few product images for better performance
-          preloadProductImages(processedProducts, 6);
+          // Preload first 12 product images for better performance (increased for faster loading)
+          preloadProductImages(processedProducts, 12);
         }
       } catch (err) {
         console.error('Error fetching products:', err);
@@ -480,6 +482,8 @@ const Products = () => {
                 const inWishlist = isInWishlist(productId);
                 const stockValue = Number(product?.stock);
                 const isOutOfStock = product?.inStock === false || (Number.isFinite(stockValue) && stockValue <= 0);
+                // Priority load first 6 images (above the fold)
+                const isPriorityImage = index < 6;
 
                 return (
                   <motion.div
@@ -500,6 +504,7 @@ const Products = () => {
                           alt={product.name || 'Product'}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                           placeholder={heroimg}
+                          priority={isPriorityImage}
                         />
                         
                         {/* Wishlist Heart Icon */}

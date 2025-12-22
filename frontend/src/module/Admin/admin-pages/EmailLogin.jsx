@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import api from "../../../services/api";
+import safeLocalStorage from "../../../utils/safeLocalStorage";
 
 const EmailLogin = () => {
   const navigate = useNavigate();
@@ -53,8 +54,8 @@ const EmailLogin = () => {
         
         if (adminToken) {
           // Store adminToken and login status
-          localStorage.setItem("adminToken", adminToken);
-          localStorage.setItem("admin_logged_in", "true");
+          safeLocalStorage.setItem("adminToken", adminToken);
+          safeLocalStorage.setItem("admin_logged_in", "true");
           
           setSuccess("Login successful! Redirecting...");
           toast.success("Admin login successful!");

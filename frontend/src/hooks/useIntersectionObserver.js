@@ -63,16 +63,34 @@ export const useIntersectionObserver = (options = {}) => {
 /**
  * Hook for lazy loading images with intersection observer
  */
-export const useLazyImage = (src, placeholder = '') => {
-  const [imageSrc, setImageSrc] = useState(placeholder);
-  const [isLoaded, setIsLoaded] = useState(false);
+export const useLazyImage = (src, placeholder = '', priority = false) => {
+  const [imageSrc, setImageSrc] = useState(priority ? src : placeholder);
+  const [isLoaded, setIsLoaded] = useState(priority);
   const [hasError, setHasError] = useState(false);
+
+  // For priority images, load immediately without intersection observer
   const { ref, hasIntersected } = useIntersectionObserver({
-    threshold: 0.1,
-    rootMargin: '100px'
+    threshold: priority ? 0 : 0.1,
+    rootMargin: priority ? '0px' : '150px' // Increased rootMargin for better performance
   });
 
   useEffect(() => {
+    // If priority loading is enabled, load immediately
+    if (priority && src && imageSrc !== src) {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        setImageSrc(src);
+        setIsLoaded(true);
+      };
+      img.onerror = () => {
+        setHasError(true);
+        setIsLoaded(true);
+      };
+      return;
+    }
+
+    // Regular lazy loading for non-priority images
     if (hasIntersected && src && imageSrc !== src) {
       const img = new Image();
       img.src = src;
@@ -85,7 +103,7 @@ export const useLazyImage = (src, placeholder = '') => {
         setIsLoaded(true);
       };
     }
-  }, [hasIntersected, src, imageSrc]);
+  }, [hasIntersected, src, imageSrc, priority]);
 
   return {
     ref,

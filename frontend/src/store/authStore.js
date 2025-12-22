@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import socketService from '../services/socketService';
+import safeLocalStorage from '../utils/safeLocalStorage';
 
 export const useAuthStore = create(
   persist(
@@ -18,8 +19,8 @@ export const useAuthStore = create(
       initialize: () => {
         // This is called manually, but Zustand persist should handle hydration automatically
         // Just ensure token is synced with localStorage
-        const storedState = JSON.parse(localStorage.getItem('auth-storage') || 'null');
-        const tokenFromStorage = localStorage.getItem('token');
+        const storedState = safeLocalStorage.getParsedItem('auth-storage', null);
+        const tokenFromStorage = safeLocalStorage.getItem('token', null);
         
         if (storedState?.state?.user && storedState?.state?.token) {
           set({ 
@@ -31,12 +32,12 @@ export const useAuthStore = create(
           
           // Ensure token is also in localStorage (in case it was lost)
           if (storedState.state.token && !tokenFromStorage) {
-            localStorage.setItem('token', storedState.state.token);
+            safeLocalStorage.setItem('token', storedState.state.token);
           }
         } else if (tokenFromStorage) {
           // Token exists in localStorage but not in Zustand - restore it
           // This handles cases where Zustand state was cleared but token remains
-          const loginTimestamp = localStorage.getItem('loginTimestamp');
+          const loginTimestamp = safeLocalStorage.getItem('loginTimestamp', null);
           set({
             isAuthenticated: true,
             token: tokenFromStorage,
@@ -65,14 +66,14 @@ export const useAuthStore = create(
         
         // CRITICAL: Store token and timestamp synchronously in localStorage
         // This ensures token is available even if Zustand persist hasn't finished
-        localStorage.setItem('token', cleanToken);
-        localStorage.setItem('loginTimestamp', loginTime.toString());
+        safeLocalStorage.setItem('token', cleanToken);
+        safeLocalStorage.setItem('loginTimestamp', loginTime.toString());
         
         // User data is already stored in Zustand's auth-storage (persisted automatically)
         // No need for separate localStorage 'user' key
         
         // Verify storage was successful
-        const storedToken = localStorage.getItem('token');
+        const storedToken = safeLocalStorage.getItem('token', null);
         if (storedToken !== cleanToken) {
           console.error('Token storage verification failed!', {
             expected: cleanToken,
@@ -100,16 +101,16 @@ export const useAuthStore = create(
         // Only remove auth-specific items, don't touch other localStorage data
         // Use try-catch to prevent errors if items don't exist
         try {
-          if (localStorage.getItem('token')) {
-            localStorage.removeItem('token');
+          if (safeLocalStorage.getItem('token', null)) {
+            safeLocalStorage.removeItem('token');
           }
           // User data is stored in auth-storage (Zustand), will be cleared with auth-storage
           // No separate 'user' key needed
-          if (localStorage.getItem('auth-storage')) {
-            localStorage.removeItem('auth-storage');
+          if (safeLocalStorage.getItem('auth-storage', null)) {
+            safeLocalStorage.removeItem('auth-storage');
           }
-          if (localStorage.getItem('loginTimestamp')) {
-            localStorage.removeItem('loginTimestamp');
+          if (safeLocalStorage.getItem('loginTimestamp', null)) {
+            safeLocalStorage.removeItem('loginTimestamp');
           }
         } catch (error) {
           console.error('Error clearing localStorage:', error);
@@ -143,14 +144,14 @@ export const useAuthStore = create(
         
         // CRITICAL: Store token and timestamp synchronously in localStorage
         // This ensures token is available even if Zustand persist hasn't finished
-        localStorage.setItem('token', cleanToken);
-        localStorage.setItem('loginTimestamp', loginTime.toString());
+        safeLocalStorage.setItem('token', cleanToken);
+        safeLocalStorage.setItem('loginTimestamp', loginTime.toString());
         
         // User data is already stored in Zustand's auth-storage (persisted automatically)
         // No need for separate localStorage 'user' key
         
         // Verify storage was successful
-        const storedToken = localStorage.getItem('token');
+        const storedToken = safeLocalStorage.getItem('token', null);
         if (storedToken !== cleanToken) {
           console.error('Token storage verification failed!', {
             expected: cleanToken,
@@ -182,9 +183,9 @@ export const useAuthStore = create(
             console.error('Error rehydrating auth store:', error);
           } else if (state) {
             // Ensure token is synced with localStorage after rehydration
-            const tokenFromStorage = localStorage.getItem('token');
+            const tokenFromStorage = safeLocalStorage.getItem('token', null);
             if (state.token && !tokenFromStorage) {
-              localStorage.setItem('token', state.token);
+              safeLocalStorage.setItem('token', state.token);
             } else if (tokenFromStorage && !state.token) {
               // Token in localStorage but not in state - restore it
               state.token = tokenFromStorage;

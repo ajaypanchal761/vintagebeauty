@@ -34,7 +34,8 @@ const Products = () => {
       let response;
       
       if (selectedSection === 'all') {
-        response = await productService.getProducts();
+        // Fetch all products for admin management (set high limit)
+        response = await productService.getProducts({ limit: 1000 });
       } else {
         response = await productService.getProductsBySection(selectedSection);
       }
@@ -52,7 +53,7 @@ const Products = () => {
         });
         
         // Add category names to products
-        let productsWithCategoryNames = (response.data.products || response.data || []).map(product => {
+        let productsWithCategoryNames = (response.products || response.data || []).map(product => {
           // Handle category - it might be populated object or just ID
           const categoryId = product.category?._id || product.category || null;
           const categoryName = product.category?.name || categoryIdToName[categoryId] || product.categoryName || '';
@@ -94,7 +95,7 @@ const Products = () => {
         setProducts(productsWithCategoryNames);
       } catch (categoryError) {
         console.error('Error fetching categories for products:', categoryError);
-        setProducts(response.data.products || response.data || []);
+        setProducts(response.products || response.data || []);
       }
     } catch (error) {
       console.error("Failed to fetch products", error);

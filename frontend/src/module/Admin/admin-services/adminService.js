@@ -1,6 +1,7 @@
 // Admin service - uses backend API only, no mock data fallbacks
 import adminApi from '../../../services/adminApi';
 import { mockSettings, mockAdminUser, mockSupportQueries } from './mockData';
+import safeLocalStorage from '../../../utils/safeLocalStorage';
 
 // Simulate API delay
 const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
@@ -39,8 +40,8 @@ const adminService = {
 
 
   logout: () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('admin_logged_in');
+    safeLocalStorage.removeItem('adminToken');
+    safeLocalStorage.removeItem('admin_logged_in');
   },
 
   forgotPassword: async () => {
@@ -931,7 +932,7 @@ const adminService = {
   // Admin Profile & Settings
   verifyToken: async () => {
     await delay();
-    const adminToken = localStorage.getItem('adminToken');
+    const adminToken = safeLocalStorage.getItem('adminToken', null);
     
     if (adminToken) {
       return {
@@ -973,7 +974,7 @@ const adminService = {
   getSettings: async () => {
     await delay();
     // Get settings from localStorage or use mock data
-    const storedSettings = localStorage.getItem('admin_settings');
+    const storedSettings = safeLocalStorage.getParsedItem('admin_settings', null);
     if (storedSettings) {
       return { data: { settings: JSON.parse(storedSettings) } };
     }
@@ -984,7 +985,7 @@ const adminService = {
     await delay();
     
     // Get current settings
-    const storedSettings = localStorage.getItem('admin_settings');
+    const storedSettings = safeLocalStorage.getParsedItem('admin_settings', null);
     let settings = storedSettings ? JSON.parse(storedSettings) : [...mockSettings];
     
     // Find and update setting
@@ -1008,7 +1009,7 @@ const adminService = {
     }
 
     // Save to localStorage
-    localStorage.setItem('admin_settings', JSON.stringify(settings));
+    safeLocalStorage.setParsedItem('admin_settings', settings);
     
     return {
       data: {
@@ -1144,7 +1145,7 @@ const adminService = {
   // Data Pages
   getDataPage: async (type) => {
     await delay();
-    const stored = localStorage.getItem(`data_page_${type}`);
+    const stored = safeLocalStorage.getParsedItem(`data_page_${type}`, null);
     if (stored) {
       return { data: JSON.parse(stored) };
     }
@@ -1160,7 +1161,7 @@ const adminService = {
       content: data.content,
       updatedAt: new Date().toISOString()
     };
-    localStorage.setItem(`data_page_${type}`, JSON.stringify(pageData));
+    safeLocalStorage.setParsedItem(`data_page_${type}`, pageData);
     return { data: pageData };
   },
 
@@ -1174,7 +1175,7 @@ const adminService = {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    localStorage.setItem(`data_page_${data.type}`, JSON.stringify(pageData));
+    safeLocalStorage.setParsedItem(`data_page_${data.type}`, pageData);
     return { data: pageData };
   }
 };

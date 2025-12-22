@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  ShoppingBag, 
-  Package, 
-  Users, 
+import {
+  ShoppingBag,
+  Package,
+  Users,
   LogOut,
   Tag,
   Menu,
@@ -21,6 +21,7 @@ import {
   MessageSquare,
   BarChart3
 } from 'lucide-react';
+import safeLocalStorage from '../../../utils/safeLocalStorage';
 
 const SidebarLayout = ({ children }) => {
   const location = useLocation();
@@ -54,8 +55,8 @@ const SidebarLayout = ({ children }) => {
 
   const handleLogout = () => {
     // Clear all admin authentication data
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('admin_logged_in');
+    safeLocalStorage.removeItem('adminToken');
+    safeLocalStorage.removeItem('admin_logged_in');
     // Redirect to login page
     window.location.href = '/admin/login';
   };

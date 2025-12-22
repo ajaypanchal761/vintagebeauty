@@ -1,11 +1,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import SidebarLayout from './SidebarLayout';
+import safeLocalStorage from '../../../utils/safeLocalStorage';
 
 const ProtectedRoute = ({ children }) => {
   // Check if admin is logged in using adminToken
-  const adminToken = localStorage.getItem('adminToken');
-  const adminLoggedIn = localStorage.getItem('admin_logged_in');
+  const adminToken = safeLocalStorage.getItem('adminToken', null);
+  const adminLoggedIn = safeLocalStorage.getItem('admin_logged_in', null);
 
   // If no admin token or not logged in, redirect to login
   if (!adminToken || adminLoggedIn !== 'true') {

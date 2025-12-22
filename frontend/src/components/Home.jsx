@@ -780,7 +780,7 @@ const Home = () => {
           </div>
 
           {/* Desktop: Static Grid */}
-          <div className="hidden md:flex items-center justify-center gap-6 lg:gap-8 px-4 md:px-6">
+          <div className="hidden md:flex items-start justify-start gap-6 lg:gap-8 overflow-x-auto scrollbar-hide pb-2 pr-6 pl-4">
             {categoryNames.map((category, index) => {
               // Use category image from database, fallback to heroimg
               const categoryImage = getCategoryImage(category);

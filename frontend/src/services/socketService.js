@@ -36,7 +36,7 @@ class SocketService {
     
     // Log connection attempt only in development (and only once)
     if (import.meta.env.DEV && !this._connectionLogged) {
-      console.log('Socket.IO connecting to:', backendUrl);
+      
       this._connectionLogged = true;
     }
     
@@ -82,7 +82,7 @@ class SocketService {
 
     this.socket.on('connect', () => {
       this.isConnected = true;
-      console.log('Socket.IO connected:', this.socket.id);
+     
       
       // Re-authenticate if token is available
       if (token) {
@@ -92,7 +92,7 @@ class SocketService {
 
     this.socket.on('disconnect', () => {
       this.isConnected = false;
-      console.log('Socket.IO disconnected');
+      
     });
 
     this.socket.on('connect_error', (error) => {
@@ -152,7 +152,7 @@ class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
-      console.log('Socket.IO disconnected manually');
+     
     }
   }
 

@@ -13,9 +13,10 @@ const LazyImage = ({
   placeholder = heroimg,
   onLoad,
   onError,
+  priority = false, // New prop for priority loading
   ...props
 }) => {
-  const { ref, src: imageSrc, isLoaded, hasError, shouldLoad } = useLazyImage(src, placeholder);
+  const { ref, src: imageSrc, isLoaded, hasError, shouldLoad } = useLazyImage(src, placeholder, priority);
 
   const handleLoad = () => {
     if (onLoad) onLoad();

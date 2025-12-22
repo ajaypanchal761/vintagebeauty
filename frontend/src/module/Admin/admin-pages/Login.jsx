@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Lock, User, Eye, EyeOff, Shield, UserPlus, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
+import safeLocalStorage from "../../../utils/safeLocalStorage";
 
 const Login = () => {
   const [phone, setPhone] = useState("");
@@ -88,8 +89,8 @@ const Login = () => {
       if (response.success && response.data.token) {
         // Note: OTP login uses token (for backward compatibility)
         // For new admin login, use EmailLogin which uses adminToken
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("admin_logged_in", "true");
+        safeLocalStorage.setItem("token", response.data.token);
+        safeLocalStorage.setItem("admin_logged_in", "true");
         setSuccess("Login successful! Redirecting...");
         toast.success("Admin login successful!");
         setTimeout(() => {

@@ -40,13 +40,13 @@ export const preloadCriticalImages = async () => {
       // Add other frequently accessed images here
     ];
 
-    console.log('[ImagePreloader] Preloading critical images...');
+   
     const results = await preloadImages(criticalImages);
 
     const successful = results.filter(result => result.status === 'fulfilled').length;
     const failed = results.filter(result => result.status === 'rejected').length;
 
-    console.log(`[ImagePreloader] Preloaded ${successful} images, ${failed} failed`);
+  
 
     return { successful, failed };
   } catch (error) {
@@ -56,7 +56,7 @@ export const preloadCriticalImages = async () => {
 };
 
 // Preload product images (for product lists)
-export const preloadProductImages = async (products, limit = 6) => {
+export const preloadProductImages = async (products, limit = 12) => {
   try {
     if (!products || !Array.isArray(products)) return;
 
@@ -68,9 +68,9 @@ export const preloadProductImages = async (products, limit = 6) => {
 
     if (productImages.length === 0) return;
 
-    console.log(`[ImagePreloader] Preloading ${productImages.length} product images...`);
+   
     await preloadImages(productImages);
-    console.log('[ImagePreloader] Product images preloaded');
+   
   } catch (error) {
     console.error('[ImagePreloader] Error preloading product images:', error);
   }
@@ -111,7 +111,7 @@ export const injectPreloadLinks = () => {
     document.head.appendChild(link);
   });
 
-  console.log('[ImagePreloader] Injected preload links');
+ 
 };
 
 // Smart preloading based on current route
@@ -122,8 +122,8 @@ export const preloadForRoute = async (pathname, products = []) => {
 
     // Route-specific preloading
     if (pathname === '/' || pathname.startsWith('/products')) {
-      // Preload first few product images for product listings
-      await preloadProductImages(products, 8);
+      // Preload first 12 product images for product listings (increased for faster loading)
+      await preloadProductImages(products, 12);
     }
 
     if (pathname.startsWith('/product/')) {
@@ -136,7 +136,7 @@ export const preloadForRoute = async (pathname, products = []) => {
       }
     }
 
-    console.log(`[ImagePreloader] Route-specific preloading completed for: ${pathname}`);
+    
   } catch (error) {
     console.error('[ImagePreloader] Error in route-specific preloading:', error);
   }

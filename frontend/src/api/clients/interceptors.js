@@ -7,6 +7,7 @@ import { API_CONFIG } from '../config/apiConfig';
 import { navigateTo } from '../../utils/navigationHelper';
 import { useAuthStore } from '../../store/authStore';
 import { logRequest, logResponse, logError } from '../utils/requestLogger';
+import safeLocalStorage from '../../utils/safeLocalStorage';
 
 /**
  * Setup request interceptors for user API
@@ -29,7 +30,7 @@ export const setupUserRequestInterceptor = (client) => {
       if (!isPublicEndpoint && !isAdminRoute) {
         // Get token from Zustand store or localStorage
         const authStore = useAuthStore.getState();
-        let token = authStore.token || localStorage.getItem('token');
+        let token = authStore.token || safeLocalStorage.getItem('token', null);
 
         if (token) {
           token = String(token).trim();
@@ -72,7 +73,7 @@ export const setupAdminRequestInterceptor = (client) => {
       logRequest(config);
 
       // Add admin token
-      const adminToken = localStorage.getItem('adminToken');
+      const adminToken = safeLocalStorage.getItem('adminToken', null);
       if (adminToken) {
         config.headers.Authorization = `Bearer ${adminToken}`;
       }
@@ -139,14 +140,14 @@ export const setupUserResponseInterceptor = (client) => {
         }
 
         // Check recent login grace period
-        const loginTimestamp = localStorage.getItem('loginTimestamp');
+        const loginTimestamp = safeLocalStorage.getItem('loginTimestamp', null);
         const timeSinceLogin = loginTimestamp ? Date.now() - parseInt(loginTimestamp) : Infinity;
         const isRecentLogin = timeSinceLogin < API_CONFIG.recentLoginGracePeriod;
 
         // Get token from multiple sources
         const authStore = useAuthStore.getState();
         const tokenFromStore = authStore.token;
-        const tokenFromStorage = localStorage.getItem('token');
+        const tokenFromStorage = safeLocalStorage.getItem('token', null);
         const hasToken = !!(tokenFromStore || tokenFromStorage);
 
         if (API_CONFIG.enableLogging) {
@@ -234,14 +235,14 @@ export const setupAdminResponseInterceptor = (client) => {
         const isLoginPage = currentPath.includes('/admin/login') || currentPath.includes('/admin/login-otp');
 
         if (!isLoginPage) {
-          const adminToken = localStorage.getItem('adminToken');
+          const adminToken = safeLocalStorage.getItem('adminToken', null);
           if (!adminToken) {
             return Promise.reject(error);
           }
 
           // Token exists but is invalid - clear and redirect
-          localStorage.removeItem('adminToken');
-          localStorage.removeItem('admin_logged_in');
+          safeLocalStorage.removeItem('adminToken');
+          safeLocalStorage.removeItem('admin_logged_in');
           window.location.href = '/admin/login';
         }
       }
