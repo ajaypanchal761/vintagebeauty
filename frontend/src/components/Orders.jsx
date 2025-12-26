@@ -606,7 +606,7 @@ const Orders = () => {
                         {item.name}
                       </h4>
                       <p className="text-xs text-gray-400">
-                        Qty: {item.quantity} {item.size && `• Size: ${item.size}`}
+                        Qty: {item.quantity} {item.isGiftSet ? '• Type: Gift Set' : (item.size && `• Size: ${item.size}`)}
                       </p>
                     </div>
                     <p className="text-sm md:text-base font-bold text-[#D4AF37]">

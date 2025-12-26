@@ -342,10 +342,16 @@ const OrderSummary = () => {
                           <h3 className="text-base md:text-lg font-bold text-white mb-1">
                             {item.name}
                           </h3>
-                          {item.size && (
+                          {item.isGiftSet ? (
                             <p className="text-sm md:text-base text-gray-400 mb-2">
-                              Size: <span className="text-[#D4AF37]">{item.size}</span>
+                              Type: <span className="text-[#D4AF37]">Gift Set</span>
                             </p>
+                          ) : (
+                            item.size && (
+                              <p className="text-sm md:text-base text-gray-400 mb-2">
+                                Size: <span className="text-[#D4AF37]">{item.size}</span>
+                              </p>
+                            )
                           )}
                           <p className="text-sm md:text-base text-gray-400 mb-2">
                             Quantity: <span className="text-white font-semibold">{item.quantity || 1}</span>

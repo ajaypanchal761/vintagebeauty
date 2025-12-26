@@ -250,10 +250,16 @@ const Cart = () => {
                         <h3 className="text-sm md:text-base font-bold text-white mb-1 truncate">
                           {productName}
                         </h3>
-                        {item.size && (
+                        {item.isGiftSet ? (
                           <p className="text-xs md:text-sm text-gray-400 mb-1">
-                            Size: {item.size}
+                            Type: <span className="text-[#D4AF37]">Gift Set</span>
                           </p>
+                        ) : (
+                          item.size && (
+                            <p className="text-xs md:text-sm text-gray-400 mb-1">
+                              Size: {item.size}
+                            </p>
+                          )
                         )}
                         {isOutOfStock ? (
                           <p className="text-sm md:text-base font-bold text-red-400">

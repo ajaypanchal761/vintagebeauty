@@ -27,7 +27,12 @@ const EditProduct = () => {
     isFeatured: false,
     isMostLoved: false,
     codAvailable: false,
-    stock: 0
+    stock: 0,
+    // Gift set fields
+    isGiftSet: false,
+    giftSetItems: [],
+    giftSetDiscount: 0,
+    giftSetManualPrice: ''
   });
 
   const [files, setFiles] = useState({
@@ -54,6 +59,13 @@ const EditProduct = () => {
     image2: false,
     image3: false,
   });
+
+  // Gift set related state
+  const [availableProducts, setAvailableProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [selectedCategoryName, setSelectedCategoryName] = useState('');
+  const [productSearchTerm, setProductSearchTerm] = useState('');
 
   useEffect(() => {
     // Fetch categories when component mounts
@@ -92,8 +104,25 @@ const EditProduct = () => {
               isFeatured: !!prod.isFeatured,
               isMostLoved: !!prod.isMostLoved,
               codAvailable: !!prod.codAvailable,
-              stock: typeof prod.stock !== 'undefined' ? prod.stock : 0
+              stock: typeof prod.stock !== 'undefined' ? prod.stock : 0,
+              // Gift set fields
+              isGiftSet: !!prod.isGiftSet,
+              giftSetItems: Array.isArray(prod.giftSetItems) ? prod.giftSetItems : [],
+              giftSetDiscount: prod.giftSetDiscount || 0,
+              giftSetManualPrice: prod.giftSetManualPrice || ''
             });
+
+            // Set category name for gift set logic
+            if (prod.category?.name) {
+              setSelectedCategoryName(prod.category.name);
+            } else if (prod.categoryName) {
+              setSelectedCategoryName(prod.categoryName);
+            }
+
+            // If it's a gift set, ensure products are loaded regardless of category name
+            if (prod.isGiftSet) {
+              setSelectedCategoryName('Gift Set');
+            }
 
             // Set preview URLs for existing images
             if (prod.images && Array.isArray(prod.images)) {
@@ -122,6 +151,62 @@ const EditProduct = () => {
         });
     }
   }, [id, isNew]);
+
+  // Fetch available products when category is Gift Set
+  useEffect(() => {
+    const fetchAvailableProducts = async () => {
+      if (selectedCategoryName === 'Gift Set' || selectedCategoryName === 'Gift Sets') {
+        try {
+          setLoadingProducts(true);
+          // Get all products without limit for gift set selection
+          const response = await productService.getProducts({
+            limit: 10000 // Set very high limit to get all products
+          });
+
+          if (response.success) {
+            // Filter out gift set products to prevent nesting
+            const regularProducts = response.products.filter(p =>
+              !p.isGiftSet && (p._id !== id) // Exclude current product if editing
+            );
+            setAvailableProducts(regularProducts);
+            setFilteredProducts(regularProducts); // Initialize filtered products
+            console.log(`Loaded ${regularProducts.length} products for gift set selection`);
+          } else {
+            console.warn('Failed to get products:', response);
+            setAvailableProducts([]);
+            setFilteredProducts([]);
+          }
+        } catch (error) {
+          console.error('Failed to fetch available products:', error);
+          showToast('Failed to load products for gift set selection', 'error');
+          setAvailableProducts([]);
+          setFilteredProducts([]);
+        } finally {
+          setLoadingProducts(false);
+        }
+      } else {
+        // Clear products when not in gift set mode
+        setAvailableProducts([]);
+        setFilteredProducts([]);
+      }
+    };
+
+    fetchAvailableProducts();
+  }, [selectedCategoryName, id]);
+
+  // Filter products based on search term
+  useEffect(() => {
+    if (productSearchTerm.trim() === '') {
+      setFilteredProducts(availableProducts);
+    } else {
+      const filtered = availableProducts.filter(product =>
+        product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+        (product.description && product.description.toLowerCase().includes(productSearchTerm.toLowerCase())) ||
+        (product.brandName && product.brandName.toLowerCase().includes(productSearchTerm.toLowerCase()))
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [productSearchTerm, availableProducts]);
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
@@ -201,6 +286,95 @@ const EditProduct = () => {
     }));
   };
 
+  // Gift set management functions
+  const addProductToGiftSet = (productToAdd) => {
+    setProduct(prev => {
+      const existingItem = prev.giftSetItems.find(item => item.product === productToAdd._id);
+
+      if (existingItem) {
+        // Update quantity if already exists
+        return {
+          ...prev,
+          giftSetItems: prev.giftSetItems.map(item =>
+            item.product === productToAdd._id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        };
+      } else {
+        // Add new item
+        return {
+          ...prev,
+          giftSetItems: [
+            ...prev.giftSetItems,
+            {
+              product: productToAdd._id,
+              quantity: 1,
+              selectedSize: null
+            }
+          ]
+        };
+      }
+    });
+  };
+
+  const removeProductFromGiftSet = (index) => {
+    setProduct(prev => ({
+      ...prev,
+      giftSetItems: prev.giftSetItems.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateGiftSetItemQuantity = (index, quantity) => {
+    if (quantity < 1) return;
+
+    setProduct(prev => ({
+      ...prev,
+      giftSetItems: prev.giftSetItems.map((item, i) =>
+        i === index ? { ...item, quantity } : item
+      )
+    }));
+  };
+
+  const handleGiftSetSizeChange = (productId, size) => {
+    setProduct(prev => ({
+      ...prev,
+      giftSetItems: prev.giftSetItems.map(item =>
+        item.product === productId
+          ? { ...item, selectedSize: size || null }
+          : item
+      )
+    }));
+  };
+
+  const calculateGiftSetTotal = () => {
+    if (!product.giftSetItems || product.giftSetItems.length === 0) return 0;
+
+    return product.giftSetItems.reduce((total, item) => {
+      // Use availableProducts for pricing calculation (not filtered)
+      const prod = availableProducts.find(p => p._id === item.product);
+      if (!prod) return total;
+
+      let price = 0;
+      if (item.selectedSize && prod.sizes) {
+        const sizeObj = prod.sizes.find(s => s.size === item.selectedSize);
+        if (sizeObj) {
+          price = sizeObj.price;
+        }
+      } else if (prod.price) {
+        price = prod.price;
+      }
+
+      return total + (price * item.quantity);
+    }, 0);
+  };
+
+  const calculateGiftSetDiscountedPrice = () => {
+    const total = calculateGiftSetTotal();
+    const discount = product.giftSetDiscount || 0;
+    return total * (1 - discount / 100);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -209,13 +383,19 @@ const EditProduct = () => {
       // Validate required fields
       const requiredFields = [
         "name",
-        "material",
         "description",
-        "colour",
-        "category",
-        "utility",
-        "care"
+        "category"
       ];
+
+      // Material and colour are optional for gift sets
+      if (!product.isGiftSet) {
+        requiredFields.push("material", "colour");
+      }
+
+      // For gift sets, utility and care are optional (not required)
+      if (!product.isGiftSet) {
+        requiredFields.push("utility", "care");
+      }
 
       const missingFields = requiredFields.filter(field => !product[field]);
       if (missingFields.length > 0) {
@@ -224,26 +404,35 @@ const EditProduct = () => {
         return;
       }
 
-      // Validate price and regularPrice
-      const price = parseFloat(product.price);
-      const regularPrice = parseFloat(product.regularPrice);
-      
-      if (isNaN(price) || price < 0) {
-        showToast("Please enter a valid price", "error");
-        setLoading(false);
-        return;
-      }
+      // Validate gift set items if it's a gift set
+      if (product.isGiftSet) {
+        if (!product.giftSetItems || product.giftSetItems.length === 0) {
+          showToast("Please add at least one product to the gift set", "error");
+          setLoading(false);
+          return;
+        }
+      } else {
+        // For regular products, validate price and regularPrice
+        const price = parseFloat(product.price);
+        const regularPrice = parseFloat(product.regularPrice);
 
-      if (isNaN(regularPrice) || regularPrice < 0) {
-        showToast("Please enter a valid regular price", "error");
-        setLoading(false);
-        return;
-      }
+        if (isNaN(price) || price < 0) {
+          showToast("Please enter a valid price", "error");
+          setLoading(false);
+          return;
+        }
 
-      if (price > regularPrice) {
-        showToast("Price cannot be greater than regular price", "error");
-        setLoading(false);
-        return;
+        if (isNaN(regularPrice) || regularPrice < 0) {
+          showToast("Please enter a valid regular price", "error");
+          setLoading(false);
+          return;
+        }
+
+        if (price > regularPrice) {
+          showToast("Price cannot be greater than regular price", "error");
+          setLoading(false);
+          return;
+        }
       }
 
       // Validate category selection
@@ -262,6 +451,9 @@ const EditProduct = () => {
           if (key === 'sizes') {
             // Send sizes as JSON string
             formData.append('sizes', JSON.stringify(product.sizes));
+          } else if (key === 'giftSetItems') {
+            // Send gift set items as JSON string
+            formData.append('giftSetItems', JSON.stringify(product.giftSetItems));
           } else {
             formData.append(key, product[key]);
           }
@@ -391,18 +583,21 @@ const EditProduct = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Material/Fragrance Type *</label>
-                    <input
-                      type="text"
-                      name="material"
-                      value={product.material}
-                      onChange={handleChange}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      required
-                      placeholder="e.g., Eau de Parfum, Eau de Toilette"
-                    />
-                  </div>
+                  {/* Material/Fragrance Type - Optional for Gift Sets */}
+                  {!product.isGiftSet && (
+                    <div>
+                      <label className="block font-medium text-gray-700">Material/Fragrance Type *</label>
+                      <input
+                        type="text"
+                        name="material"
+                        value={product.material}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                        required
+                        placeholder="e.g., Eau de Parfum, Eau de Toilette"
+                      />
+                    </div>
+                  )}
 
                   {/* Category Selection */}
                   <div className="md:col-span-2">
@@ -433,8 +628,10 @@ const EditProduct = () => {
                             onClick={() => {
                               setProduct(prev => ({
                                 ...prev,
-                                category: cat._id
+                                category: cat._id,
+                                isGiftSet: cat.name === 'Gift Set' || cat.name === 'Gift Sets'
                               }));
+                              setSelectedCategoryName(cat.name);
                             }}
                           >
                             <div className="flex items-center space-x-3">
@@ -492,8 +689,222 @@ const EditProduct = () => {
                     </div>
                   )}
 
-                  {/* Sizes Management */}
-                  <div className="md:col-span-2">
+                  {/* Gift Set Selection */}
+                  {product.isGiftSet && (
+                    <div className="md:col-span-2">
+                      <label className="block font-medium text-gray-700 mb-3">Gift Set Configuration</label>
+
+                      {/* Info note for gift sets */}
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <strong>Note:</strong> For gift sets, price, size options, material/fragrance type, colour/fragrance notes, and care instructions are automatically calculated or optional. Fill in the basic product information (name, description), discount percentage, and optionally set a manual price to override the calculated price.
+                        </p>
+                      </div>
+
+                      {/* Gift Set Discount */}
+                      <div className="mb-4">
+                        <label className="block font-medium text-gray-700 mb-2">Discount Percentage (%)</label>
+                        <input
+                          type="number"
+                          name="giftSetDiscount"
+                          value={product.giftSetDiscount}
+                          onChange={handleChange}
+                          className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          min="0"
+                          max="100"
+                          placeholder="Enter discount percentage (0-100)"
+                        />
+                      </div>
+
+                      {/* Gift Set Manual Price */}
+                      <div className="mb-4">
+                        <label className="block font-medium text-gray-700 mb-2">
+                          Manual Price (₹) <span className="text-sm text-gray-500">(Optional - overrides calculated price)</span>
+                        </label>
+                        <input
+                          type="number"
+                          name="giftSetManualPrice"
+                          value={product.giftSetManualPrice}
+                          onChange={handleChange}
+                          className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          min="0"
+                          placeholder="Enter custom price or leave empty to use calculated price"
+                        />
+                      </div>
+
+                      {/* Product Selection for Gift Set */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block font-medium text-gray-700">Select Products for Gift Set</label>
+                          <span className="text-sm text-gray-500">
+                            {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} available
+                          </span>
+                        </div>
+
+                        {/* Search Input */}
+                        <div className="mb-3">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Search products by name, description, or brand..."
+                              value={productSearchTerm}
+                              onChange={(e) => setProductSearchTerm(e.target.value)}
+                              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            />
+                            {productSearchTerm && (
+                              <button
+                                type="button"
+                                onClick={() => setProductSearchTerm('')}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                              >
+                                <X size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {loadingProducts ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                            <span className="text-sm text-gray-500">Loading products...</span>
+                          </div>
+                        ) : filteredProducts.length === 0 ? (
+                          <div className="text-center py-8 border border-gray-300 rounded-lg">
+                            <p className="text-gray-500">
+                              {productSearchTerm ? `No products match "${productSearchTerm}".` : 'No products available.'}
+                            </p>
+                            {productSearchTerm && (
+                              <button
+                                type="button"
+                                onClick={() => setProductSearchTerm('')}
+                                className="mt-2 text-blue-500 hover:text-blue-700 text-sm underline"
+                              >
+                                Clear search
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="max-h-96 overflow-y-auto border border-gray-300 rounded-lg">
+                            {filteredProducts.map((prod) => (
+                              <div key={prod._id} className="p-3 border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-3">
+                                    <img
+                                      src={prod.images?.[0] || prod.image}
+                                      alt={prod.name}
+                                      className="w-12 h-12 rounded-lg object-cover"
+                                      onError={(e) => {
+                                        e.target.src = '/placeholder-image.jpg';
+                                      }}
+                                    />
+                                    <div>
+                                      <h4 className="font-medium text-gray-900 text-sm">{prod.name}</h4>
+                                      <p className="text-xs text-gray-500">
+                                        {prod.brandName} • ₹{prod.price || (prod.sizes?.[0]?.price || 'N/A')}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    {prod.sizes && prod.sizes.length > 0 && (
+                                      <select
+                                        className="px-2 py-1 text-xs border border-gray-300 rounded"
+                                        onChange={(e) => handleGiftSetSizeChange(prod._id, e.target.value)}
+                                      >
+                                        <option value="">Default</option>
+                                        {prod.sizes.map((size, idx) => (
+                                          <option key={idx} value={size.size}>
+                                            {size.size} - ₹{size.price}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={() => addProductToGiftSet(prod)}
+                                      className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                                    >
+                                      Add
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Selected Gift Set Items */}
+                      {product.giftSetItems && product.giftSetItems.length > 0 && (
+                        <div className="mb-4">
+                          <label className="block font-medium text-gray-700 mb-2">Selected Products in Gift Set</label>
+                          <div className="space-y-2">
+                            {product.giftSetItems.map((item, index) => {
+                              // Use availableProducts to find the product (not filtered)
+                              const prod = availableProducts.find(p => p._id === item.product);
+                              return (
+                                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                  <div className="flex items-center space-x-3">
+                                    <img
+                                      src={prod?.images?.[0] || prod?.image || '/placeholder-image.jpg'}
+                                      alt={prod?.name || `Product ${item.product?.substring(0, 8) || index + 1}`}
+                                      className="w-10 h-10 rounded-lg object-cover"
+                                      onError={(e) => {
+                                        e.target.src = '/placeholder-image.jpg';
+                                      }}
+                                    />
+                                    <div>
+                                      <h5 className="font-medium text-gray-900 text-sm">
+                                        {prod?.name || `Product ${item.product?.substring(0, 8) || index + 1}`}
+                                      </h5>
+                                      <p className="text-xs text-gray-500">
+                                        Size: {item.selectedSize || 'Default'} • Qty: {item.quantity}
+                                        {prod?.price && ` • ₹${prod.price}`}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      value={item.quantity}
+                                      onChange={(e) => updateGiftSetItemQuantity(index, parseInt(e.target.value))}
+                                      className="w-16 px-2 py-1 text-xs border border-gray-300 rounded"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => removeProductFromGiftSet(index)}
+                                      className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Gift Set Price Summary */}
+                          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <h5 className="font-medium text-blue-900 mb-2">Gift Set Price Summary</h5>
+                            <div className="text-sm text-blue-800">
+                              <p>Total Price: ₹{calculateGiftSetTotal()}</p>
+                              <p>Discount: {product.giftSetDiscount}%</p>
+                              <p>Calculated Price: ₹{calculateGiftSetDiscountedPrice()}</p>
+                              {product.giftSetManualPrice && product.giftSetManualPrice > 0 ? (
+                                <p className="font-semibold text-green-700">Manual Price: ₹{product.giftSetManualPrice} (will override calculated price)</p>
+                              ) : (
+                                <p className="font-semibold">Final Price: ₹{calculateGiftSetDiscountedPrice()}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Sizes Management - Hidden for Gift Sets */}
+                  {!product.isGiftSet && (
+                    <div className="md:col-span-2">
                     <label className="block font-medium text-gray-700 mb-3">Product Sizes & Prices</label>
                     <div className="space-y-3">
                       {product.sizes.map((size, index) => (
@@ -539,47 +950,56 @@ const EditProduct = () => {
                       <p className="text-sm text-gray-500 mt-2">Add at least one size variant for your product</p>
                     )}
                   </div>
+                  )}
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Colour/Fragrance Notes *</label>
-                    <input
-                      type="text"
-                      name="colour"
-                      value={product.colour}
-                      onChange={handleChange}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      required
-                      placeholder="e.g., Floral, Woody, Citrus"
-                    />
-                  </div>
+                  {/* Colour/Fragrance Notes - Optional for Gift Sets */}
+                  {!product.isGiftSet && (
+                    <div>
+                      <label className="block font-medium text-gray-700">Colour/Fragrance Notes *</label>
+                      <input
+                        type="text"
+                        name="colour"
+                        value={product.colour}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                        required
+                        placeholder="e.g., Floral, Woody, Citrus"
+                      />
+                    </div>
+                  )}
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Price (₹) *</label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={product.price}
-                      onChange={handleChange}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      step="0.01"
-                      required
-                      min="0"
-                    />
-                  </div>
+                  {/* Price fields - Hidden for Gift Sets */}
+                  {!product.isGiftSet && (
+                    <>
+                      <div>
+                        <label className="block font-medium text-gray-700">Price (₹) *</label>
+                        <input
+                          type="number"
+                          name="price"
+                          value={product.price}
+                          onChange={handleChange}
+                          className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          step="0.01"
+                          required
+                          min="0"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Regular Price (₹) *</label>
-                    <input
-                      type="number"
-                      name="regularPrice"
-                      value={product.regularPrice}
-                      onChange={handleChange}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      step="0.01"
-                      required
-                      min="0"
-                    />
-                  </div>
+                      <div>
+                        <label className="block font-medium text-gray-700">Regular Price (₹) *</label>
+                        <input
+                          type="number"
+                          name="regularPrice"
+                          value={product.regularPrice}
+                          onChange={handleChange}
+                          className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          step="0.01"
+                          required
+                          min="0"
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div>
                     <label className="block font-medium text-gray-700">Stock Quantity *</label>
@@ -627,31 +1047,36 @@ const EditProduct = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Fragrance Notes/Utility *</label>
-                    <textarea
-                      name="utility"
-                      value={product.utility}
-                      onChange={handleChange}
-                      rows={3}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      required
-                      placeholder="e.g., Top notes: Bergamot, Middle notes: Rose, Base notes: Sandalwood"
-                    />
-                  </div>
+                  {/* Utility and Care fields - Optional for Gift Sets */}
+                  {!product.isGiftSet && (
+                    <>
+                      <div>
+                        <label className="block font-medium text-gray-700">Fragrance Notes/Utility *</label>
+                        <textarea
+                          name="utility"
+                          value={product.utility}
+                          onChange={handleChange}
+                          rows={3}
+                          className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          required
+                          placeholder="e.g., Top notes: Bergamot, Middle notes: Rose, Base notes: Sandalwood"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block font-medium text-gray-700">Care Instructions *</label>
-                    <textarea
-                      name="care"
-                      value={product.care}
-                      onChange={handleChange}
-                      rows={3}
-                      className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                      required
-                      placeholder="e.g., Store in a cool, dry place. Keep away from direct sunlight."
-                    />
-                  </div>
+                      <div>
+                        <label className="block font-medium text-gray-700">Care Instructions *</label>
+                        <textarea
+                          name="care"
+                          value={product.care}
+                          onChange={handleChange}
+                          rows={3}
+                          className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          required
+                          placeholder="e.g., Store in a cool, dry place. Keep away from direct sunlight."
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div className="flex items-center">
                     <label className="relative inline-flex items-center cursor-pointer">

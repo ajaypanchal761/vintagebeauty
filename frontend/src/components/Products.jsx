@@ -36,6 +36,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   // State for categories from API
   const [categoriesData, setCategoriesData] = useState([]);
@@ -108,14 +109,21 @@ const Products = () => {
         // Use centralized API - fetch products from database with filters
         const response = await productsService.getAll(filters);
         if (response.success) {
+          // Store total product count
+          setTotalProducts(response.total || 0);
+
           // Process products to format prices and images
           const processedProducts = (response.products || response.data || []).map((product) => {
             // Get primary image from Cloudinary
             const image = product.images?.[0] || product.image || heroimg;
-            
+
             // Format price
             let price = '';
-            if (product.price) {
+            if (product.isGiftSet) {
+              // For gift sets, use the manual price if set, otherwise use the calculated price
+              const giftSetPrice = product.giftSetManualPrice || product.price || product.giftSetDiscountedPrice || 699;
+              price = `₹${giftSetPrice}`;
+            } else if (product.price) {
               price = `₹${product.price}`;
             } else if (product.sizes && product.sizes.length > 0) {
               // Use 100ml price (index 2) or first available size
@@ -421,9 +429,14 @@ const Products = () => {
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center gap-3">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">
-              {selectedCategory ? selectedCategory : 'All Products'}
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">
+                {selectedCategory ? selectedCategory : 'All Products'}
+              </h2>
+              <span className="text-white font-bold text-2xl md:text-3xl lg:text-4xl">
+                ({totalProducts})
+              </span>
+            </div>
             {selectedCategory ? (
               <div className="flex items-center gap-3">
                 <p className="text-center text-gray-400">

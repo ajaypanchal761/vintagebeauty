@@ -96,12 +96,21 @@ const Home = () => {
   const processProducts = useCallback((productsArray) => {
     return productsArray.map((product) => {
       const image = product.images?.[0] || product.image || heroimg;
-      const price = product.price 
-        ? `₹${product.price}` 
-        : (product.sizes?.[2]?.price 
-          ? `₹${product.sizes[2].price}` 
-          : '₹699');
-      
+
+      // Handle gift set pricing properly
+      let price = '';
+      if (product.isGiftSet) {
+        // For gift sets, use manual price if set, otherwise use calculated price
+        const giftSetPrice = product.giftSetManualPrice || product.price || product.giftSetDiscountedPrice || 699;
+        price = `₹${giftSetPrice}`;
+      } else if (product.price) {
+        price = `₹${product.price}`;
+      } else if (product.sizes?.[2]?.price) {
+        price = `₹${product.sizes[2].price}`;
+      } else {
+        price = '₹699';
+      }
+
       return {
         ...product,
         id: product._id || product.id,
@@ -311,6 +320,7 @@ const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [bannerSlides, setBannerSlides] = useState([]);
     const [loadingBanner, setLoadingBanner] = useState(true);
+    const [videoDurations, setVideoDurations] = useState({}); // Store video durations
 
     // No fallback slides - only use data from API
 
@@ -329,6 +339,7 @@ const Home = () => {
               subtitle: item.subtitle || item.description || '',
               badge: item.badge || item.label || 'FEATURED',
               image: item.image || heroimg, // API returns image URL directly
+              video: item.video || null, // Video URL if available
               brand: item.brand || 'VINTAGE BEAUTY',
               link: item.link || '/products',
               buttonText: item.buttonText || 'SHOP NOW',
@@ -352,15 +363,66 @@ const Home = () => {
       fetchBannerCarousel();
     }, []);
 
+    // Function to get video duration
+    const getVideoDuration = useCallback(async (videoUrl) => {
+      return new Promise((resolve) => {
+        if (!videoUrl) {
+          resolve(5000); // Default 5 seconds for images
+          return;
+        }
+
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.src = videoUrl;
+
+        video.onloadedmetadata = () => {
+          const duration = Math.ceil(video.duration * 1000); // Convert to milliseconds
+          resolve(duration);
+        };
+
+        video.onerror = () => {
+          resolve(5000); // Fallback to 5 seconds if video fails to load
+        };
+
+        // Timeout after 5 seconds to prevent hanging
+        setTimeout(() => {
+          resolve(5000);
+        }, 5000);
+      });
+    }, []);
+
     useEffect(() => {
       if (bannerSlides.length === 0) return;
-      
-      const interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % bannerSlides.length);
-      }, 5000); // Change slide every 5 seconds
 
-      return () => clearInterval(interval);
-    }, [bannerSlides.length]);
+      const changeSlide = async () => {
+        const currentBanner = bannerSlides[currentSlide];
+
+        // Check if current slide has a video
+        if (currentBanner && currentBanner.video && currentBanner.video.trim() !== '') {
+          // For videos, use video duration or cached duration
+          let duration = videoDurations[currentSlide];
+          if (!duration) {
+            duration = await getVideoDuration(currentBanner.video);
+            setVideoDurations(prev => ({ ...prev, [currentSlide]: duration }));
+          }
+
+          // Advance to next slide after video duration
+          setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 1) % bannerSlides.length);
+          }, duration);
+        } else {
+          // For images, use fixed 5-second duration
+          setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 1) % bannerSlides.length);
+          }, 5000);
+        }
+      };
+
+      // Start the slide change process
+      changeSlide();
+
+      // No interval needed - each slide change is handled individually
+    }, [currentSlide, bannerSlides, videoDurations, getVideoDuration]);
 
     const goToSlide = (index) => {
       setCurrentSlide(index);
@@ -379,24 +441,48 @@ const Home = () => {
 
     return (
       <div className="relative w-full h-[180px] md:h-[240px] lg:h-[300px] rounded-2xl overflow-hidden">
-        {/* Background Image with Overlay */}
+        {/* Background Media with Overlay */}
         <div className="absolute inset-0">
-          <motion.img
-            key={currentSlide}
-            src={currentBanner.image}
-            alt={currentBanner.title}
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 1 }}
-            onError={(e) => {
-              // Fallback to heroimg if image fails to load
-              if (e.target.src !== heroimg) {
-                e.target.src = heroimg;
-              }
-            }}
-          />
+          {currentBanner.video && currentBanner.video.trim() !== '' && currentBanner.video.trim().length > 0 ? (
+            <motion.video
+              key={currentSlide}
+              src={currentBanner.video}
+              alt={currentBanner.title}
+              className="w-full h-full object-cover"
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 1 }}
+              autoPlay
+              muted
+              playsInline
+              onError={(e) => {
+                // Fallback to image if video fails to load
+                console.error('Video failed to load, falling back to image');
+              }}
+              onEnded={() => {
+                // Video ended - could auto-advance to next slide
+                console.log('Video completed playback');
+              }}
+            />
+          ) : (
+            <motion.img
+              key={currentSlide}
+              src={(currentBanner.image && currentBanner.image.trim() !== '' && currentBanner.image.trim().length > 0) ? currentBanner.image : heroimg}
+              alt={currentBanner.title}
+              className="w-full h-full object-cover"
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 1 }}
+              onError={(e) => {
+                // Fallback to heroimg if image fails to load
+                if (e.target.src !== heroimg) {
+                  e.target.src = heroimg;
+                }
+              }}
+            />
+          )}
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
           {/* Moonlit effect overlay */}
@@ -1220,7 +1306,16 @@ const Home = () => {
                 products.map((product, index) => {
                   const productId = product._id || product.id;
                   const productName = product.name || 'Unnamed Product';
-                  const productPrice = product.price || '₹699';
+
+                  // Handle gift set pricing for display
+                  let productPrice = '';
+                  if (product.isGiftSet) {
+                    const giftSetPrice = product.giftSetManualPrice || product.price || product.giftSetDiscountedPrice || 699;
+                    productPrice = `₹${giftSetPrice}`;
+                  } else {
+                    productPrice = product.price || '₹699';
+                  }
+
                   const productDescription = product.description || product.scentProfile || 'Premium product from Vintage Beauty';
                   const productImage = product.image || heroimg;
                   const stockValue = Number(product?.stock);
@@ -1429,11 +1524,14 @@ const Home = () => {
                 return (
                   <button
                     key={category._id || category.id || index}
-                    onClick={() => {
-                      setActiveCategory(category.name);
-                      setIsMenuOpen(false);
-                      trackCategoryVisit(category.name);
-                    }}
+                onClick={() => {
+                  // Use same navigation logic as home page category icons
+                  sessionStorage.setItem('selectedCategory', category.name);
+                  sessionStorage.setItem('autoScrollToProducts', 'true');
+                  setIsMenuOpen(false);
+                  navigate(`/products?category=${category.name.toLowerCase().replace(' ', '-')}`);
+                  trackCategoryVisit(category.name);
+                }}
                     className="flex flex-col items-center"
                   >
                     <div className={`w-16 h-16 rounded-full ${backgrounds[index % backgrounds.length]} flex items-center justify-center overflow-hidden shadow-md ${index === 0 ? 'border-2 border-[#D4AF37]' : ''}`}>
@@ -1453,6 +1551,9 @@ const Home = () => {
             <Link 
               to="/products"
               onClick={() => {
+                // Clear any category selection for "Shop All"
+                sessionStorage.removeItem('selectedCategory');
+                sessionStorage.removeItem('autoScrollToProducts');
                 setIsMenuOpen(false);
               }}
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
@@ -1463,24 +1564,6 @@ const Home = () => {
               <span className="flex-1 text-left text-sm font-semibold text-white">SHOP ALL</span>
             </Link>
 
-            {/* CATEGORIES */}
-            <div>
-              <button 
-                onClick={() => {
-                  setActiveCategory('Perfume');
-                  setIsMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
-              >
-                <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                <span className="flex-1 text-left text-sm font-semibold text-white">CATEGORIES</span>
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
 
             {/* Dynamic Categories */}
             {categoriesData.map((category) => {
@@ -1531,8 +1614,11 @@ const Home = () => {
                 <button
                   key={category._id || category.id}
                   onClick={() => {
-                    setActiveCategory(category.name);
+                    // Use same navigation logic as home page category icons
+                    sessionStorage.setItem('selectedCategory', category.name);
+                    sessionStorage.setItem('autoScrollToProducts', 'true');
                     setIsMenuOpen(false);
+                    navigate(`/products?category=${category.name.toLowerCase().replace(' ', '-')}`);
                     trackCategoryVisit(category.name);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"

@@ -280,8 +280,12 @@ const TrackOrder = () => {
                       />
                       <div className="flex-1">
                         <h4 className="text-white font-semibold text-sm md:text-base mb-1">{item.name}</h4>
-                        {item.size && (
-                          <p className="text-gray-400 text-xs md:text-sm mb-1">Size: {item.size}</p>
+                        {item.isGiftSet ? (
+                          <p className="text-gray-400 text-xs md:text-sm mb-1">Type: Gift Set</p>
+                        ) : (
+                          item.size && (
+                            <p className="text-gray-400 text-xs md:text-sm mb-1">Size: {item.size}</p>
+                          )
                         )}
                         <div className="flex items-center justify-between mt-2">
                           <p className="text-gray-400 text-xs md:text-sm">Quantity: {item.quantity}</p>

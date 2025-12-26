@@ -83,6 +83,14 @@ const productSchema = new mongoose.Schema({
   type: {
     type: String
   },
+  material: {
+    type: String,
+    trim: true
+  },
+  colour: {
+    type: String,
+    trim: true
+  },
   gender: {
     type: String,
     enum: ['men', 'women', 'unisex']
@@ -109,6 +117,52 @@ const productSchema = new mongoose.Schema({
   tags: [{
     type: String
   }],
+  utility: {
+    type: String,
+    trim: true
+  },
+  care: {
+    type: String,
+    trim: true
+  },
+  // Gift Set fields
+  isGiftSet: {
+    type: Boolean,
+    default: false
+  },
+  giftSetItems: [{
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    },
+    quantity: {
+      type: Number,
+      default: 1,
+      min: 1
+    },
+    selectedSize: {
+      type: String,
+      default: null
+    }
+  }],
+  giftSetDiscount: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+  giftSetTotalPrice: {
+    type: Number,
+    default: 0
+  },
+  giftSetDiscountedPrice: {
+    type: Number,
+    default: 0
+  },
+  giftSetManualPrice: {
+    type: Number,
+    min: 0
+  },
   slug: {
     type: String,
     unique: true,
@@ -139,6 +193,59 @@ productSchema.pre('save', function (next) {
 // Update inStock based on stock
 productSchema.pre('save', function (next) {
   this.inStock = this.stock > 0;
+  next();
+});
+
+// Auto-set isGiftSet based on giftSetItems presence
+productSchema.pre('save', function (next) {
+  // Automatically set isGiftSet if giftSetItems exist and isGiftSet is not explicitly set
+  if (this.giftSetItems && this.giftSetItems.length > 0 && this.isGiftSet !== false) {
+    this.isGiftSet = true;
+  }
+  next();
+});
+
+// Calculate gift set prices
+productSchema.pre('save', async function (next) {
+  if (this.isGiftSet && this.giftSetItems && this.giftSetItems.length > 0) {
+    try {
+      let totalPrice = 0;
+
+      // Calculate total price from gift set items
+      for (const item of this.giftSetItems) {
+        if (item.product) {
+          const product = await mongoose.model('Product').findById(item.product);
+          if (product) {
+            let itemPrice = 0;
+
+            // Get price based on selected size or default price
+            if (item.selectedSize && product.sizes && product.sizes.length > 0) {
+              const sizeObj = product.sizes.find(s => s.size === item.selectedSize);
+              if (sizeObj) {
+                itemPrice = sizeObj.price;
+              }
+            } else if (product.price) {
+              itemPrice = product.price;
+            }
+
+            totalPrice += itemPrice * item.quantity;
+          }
+        }
+      }
+
+      this.giftSetTotalPrice = totalPrice;
+      this.giftSetDiscountedPrice = totalPrice * (1 - this.giftSetDiscount / 100);
+
+      // Use manual price if set, otherwise use calculated discounted price
+      const finalPrice = this.giftSetManualPrice || this.giftSetDiscountedPrice;
+
+      // Set the main price to the final price for gift sets
+      this.price = finalPrice;
+      this.regularPrice = this.giftSetTotalPrice;
+    } catch (error) {
+      console.error('Error calculating gift set prices:', error);
+    }
+  }
   next();
 });
 

@@ -16,7 +16,11 @@ const heroCarouselSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    required: [true, 'Please provide an image URL']
+    trim: true
+  },
+  video: {
+    type: String,
+    trim: true
   },
   isActive: {
     type: Boolean,

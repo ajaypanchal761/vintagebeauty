@@ -63,17 +63,19 @@ const ComboDeals = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // Use centralized API - fetch products from database
+        // Use centralized API - fetch ALL products from database
         const response = await products.getAll({
-          category: 'perfume',
-          limit: 12
+          limit: 1000 // Fetch all products (high limit)
         });
         
         if (response.success) {
-          const processedProducts = (response.products || response.data || []).map((product) => {
+          // Filter out gift set products since they are already combos
+          const nonGiftSetProducts = (response.products || response.data || []).filter(product => !product.isGiftSet);
+
+          const processedProducts = nonGiftSetProducts.map((product) => {
             const image = product.images?.[0] || product.image || heroimg;
             const price = product.price || product.sizes?.[2]?.price || 699;
-            
+
             return {
               ...product,
               id: product._id || product.id,
@@ -250,10 +252,11 @@ const ComboDeals = () => {
       // Add all selected items to cart with combo deal info
       setIsAddingToCart(true);
       const addPromises = selectedItems.map((item) => {
-        const sizeToUse = item.sizes?.[2]?.size || item.sizes?.[0]?.size || '100ml';
+        // For gift sets, don't pass size, for regular products use size logic
+        const sizeToUse = item.isGiftSet ? null : (item.sizes?.[2]?.size || item.sizes?.[0]?.size || '100ml');
         return addItem(
-          { ...item, comboDeal: comboDealInfo }, 
-          1, 
+          { ...item, comboDeal: comboDealInfo },
+          1,
           sizeToUse,
           comboDealInfo
         );

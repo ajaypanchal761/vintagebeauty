@@ -42,9 +42,11 @@ export const useCartStore = create(
                   image: item.image || product.images?.[0] || product.image || null,
                   quantity: item.quantity || 1,
                   size: item.size || null,
-                  price: item.selectedPrice || item.price || product.price || 699,
-                  selectedPrice: item.selectedPrice || item.price || product.price || 699,
-                  comboDeal: item.comboDeal || null
+                  price: product.isGiftSet ? (product.giftSetManualPrice || product.price || 699) : (item.selectedPrice || item.price || product.price || 699),
+                  selectedPrice: product.isGiftSet ? (product.giftSetManualPrice || product.price || 699) : (item.selectedPrice || item.price || product.price || 699),
+                  comboDeal: item.comboDeal || null,
+                  isGiftSet: product.isGiftSet || false, // Include gift set flag
+                  giftSetManualPrice: product.giftSetManualPrice // Store manual price for reference
                 };
               });
               set({ items: transformedItems });
@@ -72,20 +74,25 @@ export const useCartStore = create(
       addItem: async (product, quantity = 1, size = null, comboDeal = null) => {
         const token = localStorage.getItem('token');
         const productId = product._id || product.id || product;
-        const selectedSize = size || (product.sizes?.[2]?.size || product.sizes?.[0]?.size || '100ml');
-        const selectedPrice = size 
-          ? product.sizes?.find(s => s.size === size)?.price 
-          : (product.sizes?.[2]?.price || product.sizes?.[0]?.price || product.price || 699);
+
+        // For gift set products, don't select any size
+        const selectedSize = product.isGiftSet ? null : (size || (product.sizes?.[2]?.size || product.sizes?.[0]?.size || '100ml'));
+        const selectedPrice = product.isGiftSet
+          ? (product.giftSetManualPrice || product.giftSetDiscountedPrice || product.price || 699)
+          : (size
+            ? product.sizes?.find(s => s.size === size)?.price
+            : (product.sizes?.[2]?.price || product.sizes?.[0]?.price || product.price || 699));
         const stockValue = Number(
           product?.stock ??
           product?.product?.stock
         );
         const isStockKnown = Number.isFinite(stockValue);
         const existingItem = get().items.find(item => {
-          const itemProductId = typeof item.product === 'object' 
+          const itemProductId = typeof item.product === 'object'
             ? String(item.product._id || item.product.id)
             : String(item.product || '');
-          return String(itemProductId) === String(productId) && item.size === selectedSize;
+          // For gift sets, match only on productId (no size), for regular products match both productId and size
+          return String(itemProductId) === String(productId) && (product.isGiftSet ? true : item.size === selectedSize);
         });
         const currentQuantity = existingItem?.quantity || 0;
         const newQuantity = currentQuantity + quantity;
@@ -115,20 +122,22 @@ export const useCartStore = create(
           const productIdStr = String(productId);
           const existingItem = state.items.find(item => {
             // Extract product ID - handle both string and object
-            const itemProductId = typeof item.product === 'object' 
+            const itemProductId = typeof item.product === 'object'
               ? String(item.product._id || item.product.id)
               : String(item.product || '');
-            return String(itemProductId) === productIdStr && item.size === selectedSize;
+            // For gift sets, match only on productId (no size), for regular products match both productId and size
+            return String(itemProductId) === productIdStr && (product.isGiftSet ? true : item.size === selectedSize);
           });
           
           if (existingItem) {
             return {
               items: state.items.map(item => {
                 // Extract product ID - handle both string and object
-                const itemProductId = typeof item.product === 'object' 
+                const itemProductId = typeof item.product === 'object'
                   ? String(item.product._id || item.product.id)
                   : String(item.product || '');
-                if (String(itemProductId) === productIdStr && item.size === selectedSize) {
+                // For gift sets, match only on productId (no size), for regular products match both productId and size
+                if (String(itemProductId) === productIdStr && (product.isGiftSet ? true : item.size === selectedSize)) {
                   const updatedItem = { ...item, quantity: item.quantity + quantity };
                   // Update combo deal info if provided
                   if (comboDeal) {
@@ -146,9 +155,10 @@ export const useCartStore = create(
             name: product.name,
             image: product.images?.[0] || product.image,
             quantity,
-            size: selectedSize,
+            size: selectedSize, // Will be null for gift sets
             price: selectedPrice,
-            selectedPrice
+            selectedPrice,
+            isGiftSet: product.isGiftSet || false // Store gift set flag
           };
           
           // Add combo deal info if provided

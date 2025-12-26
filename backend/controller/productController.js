@@ -378,6 +378,16 @@ exports.createProduct = async (req, res, next) => {
       }
     }
 
+    // Handle gift set items array if sent as JSON string
+    if (productData.giftSetItems && typeof productData.giftSetItems === 'string') {
+      try {
+        productData.giftSetItems = JSON.parse(productData.giftSetItems);
+      } catch (error) {
+        console.error('Error parsing giftSetItems JSON:', error);
+        productData.giftSetItems = [];
+      }
+    }
+
     // Convert string fields to proper types
     if (productData.price) productData.price = parseFloat(productData.price);
     if (productData.regularPrice) productData.regularPrice = parseFloat(productData.regularPrice);
@@ -528,6 +538,16 @@ exports.updateProduct = async (req, res, next) => {
       } catch (error) {
         console.error('Error parsing sizes JSON:', error);
         req.body.sizes = [];
+      }
+    }
+
+    // Handle gift set items array if sent as JSON string
+    if (req.body.giftSetItems && typeof req.body.giftSetItems === 'string') {
+      try {
+        req.body.giftSetItems = JSON.parse(req.body.giftSetItems);
+      } catch (error) {
+        console.error('Error parsing giftSetItems JSON:', error);
+        req.body.giftSetItems = [];
       }
     }
 

@@ -13,6 +13,8 @@ const EditHeroCarousel = () => {
     subtitle: "",
     description: "",
     image: "",
+    video: "",
+    mediaType: "image", // "image" or "video" - always has a default value
     isActive: true,
     isMobile: false,
     link: "",
@@ -22,16 +24,19 @@ const EditHeroCarousel = () => {
 
   const [files, setFiles] = useState({
     image: null,
+    video: null,
   });
 
   const [previewUrls, setPreviewUrls] = useState({
     image: "",
+    video: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [dragOver, setDragOver] = useState({
     image: false,
+    video: false,
   });
 
   useEffect(() => {
@@ -45,12 +50,22 @@ const EditHeroCarousel = () => {
               subtitle: item.subtitle || '',
               description: item.description || '',
               image: item.image || '',
+              video: item.video || '',
+              mediaType: item.video ? 'video' : 'image',
               isActive: item.isActive !== undefined ? item.isActive : true,
               isMobile: item.isMobile || false,
               link: item.link || '',
               buttonText: item.buttonText || '',
               order: item.order || 0
             });
+
+            // Set preview URLs for existing media
+            if (item.image) {
+              setPreviewUrls(prev => ({ ...prev, image: item.image }));
+            }
+            if (item.video) {
+              setPreviewUrls(prev => ({ ...prev, video: item.video }));
+            }
             if (item.image) {
               setPreviewUrls(prev => ({
                 ...prev,
@@ -87,7 +102,55 @@ const EditHeroCarousel = () => {
   };
 
   const handleFile = (file, fieldName) => {
-    if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
+    if (file) {
+      // Validate file type based on field
+      if (fieldName === 'image' && !file.type.startsWith('image/')) {
+        showToast("Please select a valid image file", "error");
+        return;
+      }
+      if (fieldName === 'video' && !file.type.startsWith('video/')) {
+        showToast("Please select a valid video file", "error");
+        return;
+      }
+
+      // Validate video duration (max 20 seconds)
+      if (fieldName === 'video') {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+
+        video.onloadedmetadata = () => {
+          window.URL.revokeObjectURL(video.src);
+          if (video.duration > 60) {
+            showToast("Video must be 1 minute (60 seconds) or shorter", "error");
+            return;
+          }
+
+          // Video is valid, proceed with upload
+          setFiles(prev => ({
+            ...prev,
+            [fieldName]: file
+          }));
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            setPreviewUrls(prev => ({
+              ...prev,
+              [fieldName]: reader.result
+            }));
+          };
+          reader.readAsDataURL(file);
+        };
+
+        video.onerror = () => {
+          window.URL.revokeObjectURL(video.src);
+          showToast("Unable to read video file", "error");
+        };
+
+        video.src = window.URL.createObjectURL(file);
+        return; // Exit early, validation will continue in onloadedmetadata
+      }
+
+      // For images, proceed normally
       setFiles(prev => ({
         ...prev,
         [fieldName]: file
@@ -135,8 +198,14 @@ const EditHeroCarousel = () => {
         return;
       }
 
-      if (!files.image && !carouselItem.image) {
-        showToast("Please upload an image or video", "error");
+      // Check if media is provided based on media type
+      if (carouselItem.mediaType === 'image' && !files.image && !carouselItem.image) {
+        showToast("Please upload an image", "error");
+        setLoading(false);
+        return;
+      }
+      if (carouselItem.mediaType === 'video' && !files.video && !carouselItem.video) {
+        showToast("Please upload a video", "error");
         setLoading(false);
         return;
       }
@@ -153,12 +222,23 @@ const EditHeroCarousel = () => {
       formData.append('isMobile', carouselItem.isMobile);
       if (carouselItem.order) formData.append('order', carouselItem.order);
 
-      // Add file if available (only if it's a new file, not existing URL)
-      if (files.image) {
-        formData.append('image', files.image);
-      } else if (carouselItem.image && !files.image && !isNew) {
-        // If updating and no new file, send existing image URL as text
-        formData.append('image', carouselItem.image);
+      // Add media files based on media type
+      if (carouselItem.mediaType === 'image') {
+        if (files.image) {
+          formData.append('image', files.image);
+        } else if (carouselItem.image && !files.image && !isNew) {
+          formData.append('image', carouselItem.image);
+        }
+        // Clear video field
+        formData.append('video', '');
+      } else if (carouselItem.mediaType === 'video') {
+        if (files.video) {
+          formData.append('video', files.video);
+        } else if (carouselItem.video && !files.video && !isNew) {
+          formData.append('video', carouselItem.video);
+        }
+        // Clear image field
+        formData.append('image', '');
       }
 
       let response;
@@ -188,16 +268,18 @@ const EditHeroCarousel = () => {
     }
   };
 
-  const isVideo = (url) => {
-    return url?.toLowerCase().endsWith('.mp4') || url?.toLowerCase().includes('video') || 
-           (files.image && files.image.type?.startsWith('video/'));
+  const isVideo = (url, fieldName) => {
+    if (fieldName === 'video') return true;
+    if (fieldName === 'image') return false;
+    return url?.toLowerCase().endsWith('.mp4') || url?.toLowerCase().endsWith('.webm') ||
+           url?.toLowerCase().endsWith('.ogg') || url?.toLowerCase().includes('video');
   };
 
   const renderFileInput = (fieldName, label, required = false) => {
     const hasPreview = previewUrls[fieldName] || files[fieldName];
     const isDragging = dragOver[fieldName];
     const previewUrl = previewUrls[fieldName];
-    const isVideoFile = isVideo(previewUrl);
+    const isVideoFile = isVideo(previewUrl, fieldName);
 
     return (
       <div className="col-span-1">
@@ -252,7 +334,7 @@ const EditHeroCarousel = () => {
                   <input
                     type="file"
                     className="sr-only"
-                    accept="image/*,video/*"
+                    accept={fieldName === 'image' ? 'image/*' : 'video/*'}
                     onChange={(e) => handleFileChange(e, fieldName)}
                   />
                 </label>
@@ -343,11 +425,65 @@ const EditHeroCarousel = () => {
                 </div>
               </div>
 
+              {/* Media Type Selection */}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Media Type</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block font-medium text-gray-700 mb-3">
+                      Select Media Type <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex space-x-4">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="mediaType"
+                          value="image"
+                          checked={carouselItem.mediaType === 'image'}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        />
+                        <span className="ml-2 text-sm text-gray-700 flex items-center">
+                          <ImagePlus className="w-4 h-4 mr-1" />
+                          Image
+                        </span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="mediaType"
+                          value="video"
+                          checked={carouselItem.mediaType === 'video'}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        />
+                        <span className="ml-2 text-sm text-gray-700 flex items-center">
+                          <Video className="w-4 h-4 mr-1" />
+                          Video
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Media Upload */}
               <div className="bg-gray-50 rounded-xl p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Media</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                  {carouselItem.mediaType === 'image' ? 'Image Upload' : 'Video Upload'}
+                </h2>
+                {carouselItem.mediaType === 'video' && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Video Requirements:</strong> Maximum 1 minute (60 seconds) duration. Videos longer than 60 seconds will be rejected.
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 gap-6">
-                  {renderFileInput('image', 'Image or Video', true)}
+                  {carouselItem.mediaType === 'image'
+                    ? renderFileInput('image', 'Image', true)
+                    : renderFileInput('video', 'Video', true)
+                  }
                 </div>
               </div>
 

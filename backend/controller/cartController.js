@@ -36,20 +36,27 @@ exports.addToCart = async (req, res, next) => {
       });
     }
 
-    // Determine selected price based on size
+    // Determine selected price based on product type
     let selectedPrice = product.price || 0;
-    if (size && product.sizes && product.sizes.length > 0) {
-      const sizeOption = product.sizes.find(s => s.size === size);
-      if (sizeOption) {
-        selectedPrice = sizeOption.price;
-      } else {
-        // Use default size price
-        selectedPrice = product.sizes[0]?.price || product.price || 0;
+
+    if (product.isGiftSet) {
+      // For gift sets, use manual price if set, otherwise use the calculated price
+      selectedPrice = product.giftSetManualPrice || product.price || 0;
+    } else {
+      // For regular products, use size-based pricing
+      if (size && product.sizes && product.sizes.length > 0) {
+        const sizeOption = product.sizes.find(s => s.size === size);
+        if (sizeOption) {
+          selectedPrice = sizeOption.price;
+        } else {
+          // Use default size price
+          selectedPrice = product.sizes[0]?.price || product.price || 0;
+        }
+      } else if (product.sizes && product.sizes.length > 0) {
+        // Use default size (100ml or first available)
+        const defaultSize = product.sizes.find(s => s.size === '100ml') || product.sizes[0];
+        selectedPrice = defaultSize?.price || product.price || 0;
       }
-    } else if (product.sizes && product.sizes.length > 0) {
-      // Use default size (100ml or first available)
-      const defaultSize = product.sizes.find(s => s.size === '100ml') || product.sizes[0];
-      selectedPrice = defaultSize?.price || product.price || 0;
     }
 
     // Check stock
@@ -66,9 +73,13 @@ exports.addToCart = async (req, res, next) => {
       cart = await Cart.create({ user: req.user._id, items: [] });
     }
 
-    // Check if item already exists with same size
+    // Check if item already exists (different logic for gift sets vs regular products)
     const existingItemIndex = cart.items.findIndex(
-      item => item.product.toString() === productId && item.size === size
+      item => {
+        const productMatch = item.product.toString() === productId;
+        // For gift sets, match only on product (no size), for regular products match both product and size
+        return productMatch && (product.isGiftSet ? true : item.size === size);
+      }
     );
 
     if (existingItemIndex !== -1) {

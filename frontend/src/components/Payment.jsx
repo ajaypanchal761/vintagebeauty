@@ -610,7 +610,7 @@ const Payment = () => {
                           )}
                         </div>
                         <p className="text-xs md:text-sm text-gray-400">
-                          {item.size} × {item.quantity}
+                          {item.isGiftSet ? `Gift Set × ${item.quantity}` : `${item.size} × ${item.quantity}`}
                         </p>
                         {stockIssue && !stockIssue.isOutOfStock && (
                           <p className="text-xs text-red-400 mt-1">

@@ -43,6 +43,62 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // State for gift set product details
+  const [giftSetProductDetails, setGiftSetProductDetails] = useState([]);
+  const [loadingGiftSetDetails, setLoadingGiftSetDetails] = useState(false);
+
+  // Fetch detailed information for gift set products
+  const fetchGiftSetProductDetails = async (giftSetItems) => {
+    if (!giftSetItems || giftSetItems.length === 0) return;
+
+    setLoadingGiftSetDetails(true);
+    try {
+      const productDetails = [];
+
+      for (const item of giftSetItems) {
+        try {
+          const response = await products.getById(item.product);
+          if (response.success && response.data) {
+            productDetails.push({
+              ...response.data,
+              quantity: item.quantity,
+              selectedSize: item.selectedSize
+            });
+          } else {
+            // Add placeholder data for failed requests
+            productDetails.push({
+              _id: item.product,
+              name: `Product ${item.product?.substring(0, 8) || productDetails.length + 1}`,
+              description: 'A luxurious fragrance product included in this gift set.',
+              images: [heroimg],
+              price: 0,
+              quantity: item.quantity,
+              selectedSize: item.selectedSize
+            });
+          }
+        } catch (error) {
+          console.error(`Failed to fetch product ${item.product}:`, error);
+          // Add placeholder data for failed requests
+          productDetails.push({
+            _id: item.product,
+            name: `Product ${item.product?.substring(0, 8) || productDetails.length + 1}`,
+            description: 'A luxurious fragrance product included in this gift set.',
+            images: [heroimg],
+            price: 0,
+            quantity: item.quantity,
+            selectedSize: item.selectedSize
+          });
+        }
+      }
+
+      setGiftSetProductDetails(productDetails);
+    } catch (error) {
+      console.error('Error fetching gift set product details:', error);
+    } finally {
+      setLoadingGiftSetDetails(false);
+    }
+  };
+
   // State for reviews
   const [reviews, setReviews] = useState([]);
   const [userReview, setUserReview] = useState(null);
@@ -78,6 +134,11 @@ const ProductDetail = () => {
 
           // Track product view
           trackProductView(productData);
+
+          // Fetch gift set product details if it's a gift set
+          if (productData.isGiftSet && productData.giftSetItems && productData.giftSetItems.length > 0) {
+            fetchGiftSetProductDetails(productData.giftSetItems);
+          }
 
           // Fetch related products from same category
           if (productData.category) {
@@ -509,8 +570,8 @@ const ProductDetail = () => {
           {/* 4 Specification Boxes */}
           <div className="grid grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-6">
             <div className="bg-black bg-opacity-30 rounded-lg p-2 md:p-3 text-center">
-              <p className="text-[10px] md:text-xs text-gray-300 mb-1">Size</p>
-              <p className="text-xs md:text-sm font-bold text-white">{size}</p>
+              <p className="text-xs md:text-xs text-gray-300 mb-1">{product.isGiftSet ? 'Type' : 'Size'}</p>
+              <p className="text-sm md:text-sm font-bold text-white">{product.isGiftSet ? 'Gift Set' : size}</p>
             </div>
             <div className="bg-black bg-opacity-30 rounded-lg p-2 md:p-3 text-center">
               <p className="text-[10px] md:text-xs text-gray-300 mb-1">Purity</p>
@@ -536,8 +597,8 @@ const ProductDetail = () => {
             </p>
           </div>
 
-          {/* Size Selector */}
-          {product.sizes && product.sizes.length > 0 && (
+          {/* Size Selector - Hidden for Gift Sets */}
+          {product.sizes && product.sizes.length > 0 && !product.isGiftSet && (
             <div className="mb-6">
               <p className="text-sm text-gray-300 mb-3">Select Size</p>
               <div className="flex flex-wrap gap-3">
@@ -563,6 +624,139 @@ const ProductDetail = () => {
               {product.description || product.scentProfile || 'Premium fragrance from Vintage Beauty. Experience luxury and elegance with this exquisite scent.'}
             </p>
           </div>
+
+          {/* Gift Set Contents Section */}
+          {product.isGiftSet && product.giftSetItems && product.giftSetItems.length > 0 && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-lg md:text-xl font-bold text-white mb-3">What's Inside This Gift Set</h3>
+              <div className="bg-black bg-opacity-20 rounded-lg p-4">
+                {loadingGiftSetDetails ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]"></div>
+                    <span className="ml-3 text-gray-300">Loading gift set products...</span>
+                  </div>
+                ) : giftSetProductDetails.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {giftSetProductDetails.map((productDetail, index) => (
+                      <div key={productDetail._id || index} className="bg-gray-800 bg-opacity-50 rounded-lg p-3 border border-gray-700 text-center hover:bg-opacity-70 transition-all duration-200">
+                        {/* Product Image */}
+                        <div className="relative mb-2">
+                          <img
+                            src={productDetail.images?.[0] || heroimg}
+                            alt={productDetail.name || `Product ${index + 1}`}
+                            className="w-full h-20 md:h-24 object-cover rounded-md border-2 border-[#D4AF37] shadow-lg"
+                            onError={(e) => {
+                              e.target.src = heroimg;
+                            }}
+                          />
+                          {/* Quantity Badge */}
+                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#D4AF37] rounded-full flex items-center justify-center text-black font-bold text-xs shadow-lg">
+                            {productDetail.quantity}
+                          </div>
+                        </div>
+
+                        {/* Product Name */}
+                        <h4 className="text-sm font-semibold text-white mb-1 line-clamp-2">
+                          {productDetail.name || `Product ${index + 1}`}
+                        </h4>
+
+                        {/* Size Info */}
+                        {productDetail.selectedSize && (
+                          <p className="text-xs text-[#D4AF37] font-medium">
+                            {productDetail.selectedSize}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : product.giftSetItems.length > 0 ? (
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 mb-2">🎁</div>
+                    <p className="text-gray-300">
+                      This gift set contains {product.giftSetItems.length} premium fragrance product{product.giftSetItems.length > 1 ? 's' : ''}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Product details are being loaded...
+                    </p>
+                  </div>
+                ) : null}
+
+                {/* Gift Set Summary */}
+                {giftSetProductDetails.length > 0 && (
+                  <div className="mt-6 pt-4 border-t border-gray-700">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">Total Products in Set:</span>
+                      <span className="text-white font-bold">{giftSetProductDetails.length} Premium Items</span>
+                    </div>
+                    {product.giftSetDiscount > 0 && (
+                      <>
+                        <div className="flex items-center justify-between text-sm mt-2">
+                          <span className="text-gray-300">Total Value:</span>
+                          <span className="text-gray-400 line-through">
+                            ₹{giftSetProductDetails.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm mt-1">
+                          <span className="text-green-400">You Save:</span>
+                          <span className="text-green-400 font-bold">
+                            ₹{(giftSetProductDetails.reduce((total, item) => total + (item.price * item.quantity), 0) - product.price).toFixed(2)} {product.giftSetManualPrice ? '(Custom Pricing)' : `(${product.giftSetDiscount}%)`}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Material/Fragrance Type Section */}
+          {product.material && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Material/Fragrance Type</h3>
+              <div className="bg-black bg-opacity-20 rounded-lg p-4">
+                <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+                  {product.material}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Colour/Fragrance Notes Section */}
+          {product.colour && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Colour/Fragrance Notes</h3>
+              <div className="bg-black bg-opacity-20 rounded-lg p-4">
+                <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+                  {product.colour}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Fragrance Notes/Utility Section */}
+          {product.utility && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Fragrance Notes/Utility</h3>
+              <div className="bg-black bg-opacity-20 rounded-lg p-4">
+                <p className="text-sm md:text-base text-gray-300 leading-relaxed whitespace-pre-line">
+                  {product.utility}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Care Instructions Section */}
+          {product.care && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Care Instructions</h3>
+              <div className="bg-black bg-opacity-20 rounded-lg p-4">
+                <p className="text-sm md:text-base text-gray-300 leading-relaxed whitespace-pre-line">
+                  {product.care}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Reviews Section */}
           <div className="mb-6 md:mb-8">
@@ -720,11 +914,13 @@ const ProductDetail = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 {relatedProducts.map((relatedProduct) => {
                   const relatedId = relatedProduct._id || relatedProduct.id;
-                  const relatedPrice = relatedProduct.price
-                    ? `₹${relatedProduct.price}`
-                    : (relatedProduct.sizes && relatedProduct.sizes.length > 0
-                      ? `₹${relatedProduct.sizes[2]?.price || relatedProduct.sizes[0]?.price}`
-                      : '₹699');
+                  const relatedPrice = relatedProduct.isGiftSet
+                    ? `₹${relatedProduct.giftSetManualPrice || relatedProduct.price || relatedProduct.giftSetDiscountedPrice || 699}`
+                    : (relatedProduct.price
+                      ? `₹${relatedProduct.price}`
+                      : (relatedProduct.sizes && relatedProduct.sizes.length > 0
+                        ? `₹${relatedProduct.sizes[2]?.price || relatedProduct.sizes[0]?.price}`
+                        : '₹699'));
 
                   return (
                     <Link

@@ -373,8 +373,16 @@ const Products = () => {
           
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="font-bold text-green-600 text-lg">₹{product.price?.toFixed(2) || '0.00'}</div>
-              {product.regularPrice && product.regularPrice > product.price && (
+              {product.isGiftSet ? (
+                // For gift sets, show manual price or calculated price
+                <div className="font-bold text-green-600 text-lg">
+                  ₹{(product.giftSetManualPrice || product.price || product.giftSetDiscountedPrice || 0).toFixed(2)}
+                  {product.giftSetManualPrice && <span className="text-xs text-blue-500 ml-1">(Manual)</span>}
+                </div>
+              ) : (
+                <div className="font-bold text-green-600 text-lg">₹{product.price?.toFixed(2) || '0.00'}</div>
+              )}
+              {product.regularPrice && product.regularPrice > (product.isGiftSet ? (product.giftSetManualPrice || product.price) : product.price) && (
                 <div className="text-gray-400 text-xs line-through">₹{product.regularPrice.toFixed(2)}</div>
               )}
             </div>

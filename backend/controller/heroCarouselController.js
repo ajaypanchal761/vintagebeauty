@@ -57,45 +57,91 @@ exports.createCarouselItem = async (req, res, next) => {
   try {
     const carouselData = req.body;
 
-    // Handle image upload if file is provided
-    if (req.files && req.files.image && req.files.image.length > 0) {
-      try {
-        const file = req.files.image[0];
-        
-        const uploadResult = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'apm-beauty-hero-carousel',
-              resource_type: 'auto', // Auto-detect image or video
-              transformation: [
-                { quality: 'auto' },
-                { fetch_format: 'auto' }
-              ]
-            },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result);
-            }
-          );
-          
-          const bufferStream = new Readable();
-          bufferStream.push(file.buffer);
-          bufferStream.push(null);
-          bufferStream.pipe(uploadStream);
-        });
-        
-        carouselData.image = uploadResult.secure_url;
-      } catch (uploadError) {
-        console.error('Cloudinary upload error:', uploadError);
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to upload image to Cloudinary',
-          error: uploadError.message || 'Unknown upload error'
-        });
+    // Handle media upload (image or video)
+    if (req.files) {
+      // Handle image upload
+      if (req.files.image && req.files.image.length > 0) {
+        try {
+          const file = req.files.image[0];
+
+          const uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'apm-beauty-hero-carousel',
+                resource_type: 'image',
+                transformation: [
+                  { quality: 'auto' },
+                  { fetch_format: 'auto' }
+                ]
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+
+            const bufferStream = new Readable();
+            bufferStream.push(file.buffer);
+            bufferStream.push(null);
+            bufferStream.pipe(uploadStream);
+          });
+
+          carouselData.image = uploadResult.secure_url;
+        } catch (uploadError) {
+          console.error('Cloudinary image upload error:', uploadError);
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to upload image to Cloudinary',
+            error: uploadError.message || 'Unknown upload error'
+          });
+        }
       }
-    } else if (req.body.image && typeof req.body.image === 'string') {
-      // If no file but image URL is provided, use the URL directly
+
+      // Handle video upload
+      if (req.files.video && req.files.video.length > 0) {
+        try {
+          const file = req.files.video[0];
+
+          const uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'apm-beauty-hero-carousel',
+                resource_type: 'video',
+                transformation: [
+                  { quality: 'auto' },
+                  { fetch_format: 'auto' }
+                ]
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+
+            const bufferStream = new Readable();
+            bufferStream.push(file.buffer);
+            bufferStream.push(null);
+            bufferStream.pipe(uploadStream);
+          });
+
+          carouselData.video = uploadResult.secure_url;
+        } catch (uploadError) {
+          console.error('Cloudinary video upload error:', uploadError);
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to upload video to Cloudinary',
+            error: uploadError.message || 'Unknown upload error'
+          });
+        }
+      }
+    }
+
+    // Handle existing URLs if no new files uploaded
+    if (req.body.image && typeof req.body.image === 'string' && !req.files?.image) {
       carouselData.image = req.body.image;
+    }
+    if (req.body.video && typeof req.body.video === 'string' && !req.files?.video) {
+      carouselData.video = req.body.video;
     }
 
     // Set order if not provided
@@ -123,45 +169,91 @@ exports.updateCarouselItem = async (req, res, next) => {
   try {
     const carouselData = { ...req.body };
 
-    // Handle image upload if file is provided
-    if (req.files && req.files.image && req.files.image.length > 0) {
-      try {
-        const file = req.files.image[0];
-        
-        const uploadResult = await new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'apm-beauty-hero-carousel',
-              resource_type: 'auto',
-              transformation: [
-                { quality: 'auto' },
-                { fetch_format: 'auto' }
-              ]
-            },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result);
-            }
-          );
-          
-          const bufferStream = new Readable();
-          bufferStream.push(file.buffer);
-          bufferStream.push(null);
-          bufferStream.pipe(uploadStream);
-        });
-        
-        carouselData.image = uploadResult.secure_url;
-      } catch (uploadError) {
-        console.error('Cloudinary upload error:', uploadError);
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to upload image to Cloudinary',
-          error: uploadError.message || 'Unknown upload error'
-        });
+    // Handle media upload (image or video)
+    if (req.files) {
+      // Handle image upload
+      if (req.files.image && req.files.image.length > 0) {
+        try {
+          const file = req.files.image[0];
+
+          const uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'apm-beauty-hero-carousel',
+                resource_type: 'image',
+                transformation: [
+                  { quality: 'auto' },
+                  { fetch_format: 'auto' }
+                ]
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+
+            const bufferStream = new Readable();
+            bufferStream.push(file.buffer);
+            bufferStream.push(null);
+            bufferStream.pipe(uploadStream);
+          });
+
+          carouselData.image = uploadResult.secure_url;
+        } catch (uploadError) {
+          console.error('Cloudinary image upload error:', uploadError);
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to upload image to Cloudinary',
+            error: uploadError.message || 'Unknown upload error'
+          });
+        }
       }
-    } else if (req.body.image && typeof req.body.image === 'string') {
-      // If no file but image URL is provided, use the URL directly
+
+      // Handle video upload
+      if (req.files.video && req.files.video.length > 0) {
+        try {
+          const file = req.files.video[0];
+
+          const uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'apm-beauty-hero-carousel',
+                resource_type: 'video',
+                transformation: [
+                  { quality: 'auto' },
+                  { fetch_format: 'auto' }
+                ]
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+
+            const bufferStream = new Readable();
+            bufferStream.push(file.buffer);
+            bufferStream.push(null);
+            bufferStream.pipe(uploadStream);
+          });
+
+          carouselData.video = uploadResult.secure_url;
+        } catch (uploadError) {
+          console.error('Cloudinary video upload error:', uploadError);
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to upload video to Cloudinary',
+            error: uploadError.message || 'Unknown upload error'
+          });
+        }
+      }
+    }
+
+    // Handle existing URLs if no new files uploaded
+    if (req.body.image && typeof req.body.image === 'string' && !req.files?.image) {
       carouselData.image = req.body.image;
+    }
+    if (req.body.video && typeof req.body.video === 'string' && !req.files?.video) {
+      carouselData.video = req.body.video;
     }
 
     const carouselItem = await HeroCarousel.findByIdAndUpdate(
