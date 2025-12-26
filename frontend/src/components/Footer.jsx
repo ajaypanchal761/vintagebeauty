@@ -101,6 +101,36 @@ const Footer = () => {
               </p>
             </div>
           </div>
+
+          {/* Our Locations */}
+          <div className="flex-1 min-w-[280px]">
+            <h4 className="text-sm md:text-base font-semibold text-white mb-3">
+              Our Locations
+            </h4>
+            <div className="space-y-4 text-xs md:text-sm text-gray-400">
+              {/* India Address */}
+              <div>
+                <h5 className="font-medium text-[#D4AF37] mb-1">India</h5>
+                <div className="space-y-0.5">
+                  <p className="font-medium">APM Beauty & Perfumery Pvt Ltd</p>
+                  <p>Ground Floor Zaidi Apartment-3, Sector-73, Noida-201307</p>
+                  <p>Contact number: <span className="text-[#D4AF37]">8882815969</span></p>
+                  <p>Mail id: <a href="mailto:info@vintagebeauty.co.in" className="text-[#D4AF37] hover:underline">info@vintagebeauty.co.in</a></p>
+                </div>
+              </div>
+
+              {/* Nepal Address */}
+              <div>
+                <h5 className="font-medium text-[#D4AF37] mb-1">Nepal</h5>
+                <div className="space-y-0.5">
+                  <p className="font-medium">J.P. Marketing Groups</p>
+                  <p>Janakpurdham-7, Janakinagar, Dhanusha, Nepal</p>
+                  <p>Telephone number: <span className="text-[#D4AF37]">041591376</span></p>
+                  <p>Mobile number: <span className="text-[#D4AF37]">9854050076</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Divider */}

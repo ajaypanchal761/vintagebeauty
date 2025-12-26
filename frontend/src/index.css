@@ -89,3 +89,16 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #d1d5db #f3f4f6;
 }
+
+/* Mobile font size adjustments for ProductDetail */
+@media (max-width: 480px) {
+  /* Reduce product name heading font size on mobile */
+  .product-detail-heading {
+    font-size: 1.125rem !important; /* 18px instead of 20px */
+  }
+
+  /* Reduce product description paragraph font size on mobile */
+  .product-detail-description {
+    font-size: 10px !important; /* 10px instead of 11px */
+  }
+}

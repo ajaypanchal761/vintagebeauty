@@ -593,7 +593,7 @@ const ProductDetail = () => {
 
           {/* Product Name and Price */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-black flex-1">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-black flex-1 product-detail-heading">
               {product.name}
             </h2>
             <p className="text-lg md:text-xl lg:text-2xl font-bold text-[#D4AF37] ml-4">
@@ -624,7 +624,7 @@ const ProductDetail = () => {
 
           {/* Product Description */}
           <div className="mb-6 md:mb-8">
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+            <p className="text-[11px] md:text-xs text-gray-700 leading-relaxed product-detail-description">
               {product.description || product.scentProfile || 'Premium fragrance from Vintage Beauty. Experience luxury and elegance with this exquisite scent.'}
             </p>
           </div>
