@@ -39,7 +39,7 @@ const TrackOrder = lazy(() => import('./components/TrackOrder'))
 
 // Loading component for Suspense fallback
 const PageLoading = () => (
-  <div className="min-h-screen bg-black text-white flex items-center justify-center">
+  <div className="min-h-screen bg-white text-black flex items-center justify-center">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D4AF37]"></div>
   </div>
 );
@@ -70,15 +70,15 @@ function ScrollToTop() {
 // Smooth Scroll Setup Component
 function SmoothScroll({ children }) {
   const location = useLocation();
-  
+
   useEffect(() => {
     // Disable Lenis for admin routes to allow independent scrolling
     const isAdminRoute = location.pathname.startsWith('/admin');
-    
+
     if (isAdminRoute) {
       return; // Don't initialize Lenis for admin routes
     }
-    
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -113,7 +113,7 @@ function SmoothScroll({ children }) {
 function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Set up navigation helper for use in API interceptor
   useEffect(() => {
     setNavigate(navigate);
@@ -121,7 +121,7 @@ function AppRoutes() {
       setNavigate(null);
     };
   }, [navigate]);
-  
+
   return (
     <>
       <NotificationListener />
@@ -129,33 +129,33 @@ function AppRoutes() {
         <AnimatePresence mode="wait">
           <Suspense fallback={<PageLoading />}>
             <Routes location={location} key={location.pathname}>
-            <Route path="/admin/*" element={<Admin />} />
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/account" element={<UserProtectedRoute><Account /></UserProtectedRoute>} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/order-summary" element={<UserProtectedRoute><OrderSummary /></UserProtectedRoute>} />
-            <Route path="/payment" element={<UserProtectedRoute><Payment /></UserProtectedRoute>} />
-            <Route path="/order-success" element={<UserProtectedRoute><OrderSuccess /></UserProtectedRoute>} />
-            <Route path="/products/order-success" element={<UserProtectedRoute><OrderSuccess /></UserProtectedRoute>} />
-            <Route path="/orders" element={<UserProtectedRoute><Orders /></UserProtectedRoute>} />
-            <Route path="/addresses" element={<UserProtectedRoute><Addresses /></UserProtectedRoute>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/faqs" element={<FAQs />} />
-            <Route path="/support" element={<Support />} />
-            <Route path="/my-support" element={<UserProtectedRoute><MySupport /></UserProtectedRoute>} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-            <Route path="/refund-policy" element={<RefundPolicy />} />
-            <Route path="/about-us" element={<AboutUs />} />
-            <Route path="/deals" element={<Deals />} />
-            <Route path="/combo-deals/:id" element={<ComboDeals />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/blog/:slug" element={<BlogDetail />} />
-            <Route path="/track-order" element={<TrackOrder />} />
+              <Route path="/admin/*" element={<Admin />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/account" element={<UserProtectedRoute><Account /></UserProtectedRoute>} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/order-summary" element={<UserProtectedRoute><OrderSummary /></UserProtectedRoute>} />
+              <Route path="/payment" element={<UserProtectedRoute><Payment /></UserProtectedRoute>} />
+              <Route path="/order-success" element={<UserProtectedRoute><OrderSuccess /></UserProtectedRoute>} />
+              <Route path="/products/order-success" element={<UserProtectedRoute><OrderSuccess /></UserProtectedRoute>} />
+              <Route path="/orders" element={<UserProtectedRoute><Orders /></UserProtectedRoute>} />
+              <Route path="/addresses" element={<UserProtectedRoute><Addresses /></UserProtectedRoute>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/faqs" element={<FAQs />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/my-support" element={<UserProtectedRoute><MySupport /></UserProtectedRoute>} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/deals" element={<Deals />} />
+              <Route path="/combo-deals/:id" element={<ComboDeals />} />
+              <Route path="/blogs" element={<Blogs />} />
+              <Route path="/blog/:slug" element={<BlogDetail />} />
+              <Route path="/track-order" element={<TrackOrder />} />
             </Routes>
           </Suspense>
         </AnimatePresence>

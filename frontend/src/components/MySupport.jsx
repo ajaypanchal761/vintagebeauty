@@ -24,7 +24,7 @@ const MySupport = () => {
     try {
       setLoading(true);
       const response = await supportService.getMySupport();
-      
+
       if (response.success) {
         setSupportItems(response.data.items || []);
       }
@@ -85,18 +85,18 @@ const MySupport = () => {
 
   return (
     <UserProtectedRoute>
-      <div className="min-h-screen bg-black text-white overflow-x-hidden pb-20 md:pb-0">
+      <div className="min-h-screen bg-white text-black overflow-x-hidden pb-20 md:pb-0">
         {/* Navigation Bar */}
-        <nav className="w-full bg-black border-b border-gray-800 sticky top-0 z-50">
+        <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
             <div className="flex items-center justify-between">
               {/* Back Button */}
               <button
                 onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label="Back"
               >
-                <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -104,13 +104,13 @@ const MySupport = () => {
               {/* Logo/Brand Name */}
               <div className="flex items-center gap-2 md:gap-3">
                 {logo && (
-                  <img 
-                    src={logo} 
-                    alt="VINTAGE BEAUTY Logo" 
+                  <img
+                    src={logo}
+                    alt="VINTAGE BEAUTY Logo"
                     className="h-6 md:h-8 w-auto"
                   />
                 )}
-                <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+                <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
                   My Support
                 </h1>
               </div>
@@ -118,7 +118,7 @@ const MySupport = () => {
               {/* New Support Button */}
               <button
                 onClick={() => navigate('/support')}
-                className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label="New Support"
                 title="New Support Request"
               >
@@ -138,11 +138,11 @@ const MySupport = () => {
             </div>
           ) : supportItems.length === 0 ? (
             <div className="text-center py-20">
-              <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              <h3 className="text-xl font-semibold text-white mb-2">No Support Requests Yet</h3>
-              <p className="text-gray-400 mb-6">You haven't submitted any queries or tickets yet.</p>
+              <h3 className="text-xl font-semibold text-black mb-2">No Support Requests Yet</h3>
+              <p className="text-gray-600 mb-6">You haven't submitted any queries or tickets yet.</p>
               <button
                 onClick={() => navigate('/support')}
                 className="bg-gradient-to-r from-[#D4AF37] to-amber-600 text-black font-semibold py-3 px-6 rounded-lg hover:from-amber-500 hover:to-[#D4AF37] transition-all duration-200"
@@ -153,7 +153,7 @@ const MySupport = () => {
           ) : (
             <>
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">My Support History</h2>
+                <h2 className="text-2xl font-bold text-black">My Support History</h2>
                 <button
                   onClick={() => navigate('/support')}
                   className="bg-gradient-to-r from-[#D4AF37] to-amber-600 text-black font-semibold py-2 px-4 rounded-lg hover:from-amber-500 hover:to-[#D4AF37] transition-all duration-200 text-sm"
@@ -166,12 +166,12 @@ const MySupport = () => {
                 {supportItems.map((item) => (
                   <div
                     key={item._id}
-                    className="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 hover:border-[#D4AF37]/30 transition-colors"
+                    className="bg-white rounded-xl p-4 md:p-6 border border-gray-200 shadow-sm hover:border-[#D4AF37] transition-colors"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-white">
+                          <h3 className="text-lg font-semibold text-black">
                             {item.type === 'query' ? item.subject : item.title}
                           </h3>
                           <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(item.status)}`}>
@@ -181,8 +181,8 @@ const MySupport = () => {
                             {item.priority}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-400 mb-2">
-                          Category: <span className="text-white capitalize">{item.category}</span>
+                        <p className="text-sm text-gray-600 mb-2">
+                          Category: <span className="text-black capitalize">{item.category}</span>
                         </p>
                         <p className="text-sm text-gray-500">
                           Created: {formatDate(item.createdAt)}
@@ -190,7 +190,7 @@ const MySupport = () => {
                       </div>
                       <button
                         onClick={() => viewDetails(item)}
-                        className="ml-4 text-[#D4AF37] hover:text-amber-400 transition-colors"
+                        className="ml-4 text-[#D4AF37] hover:text-amber-600 transition-colors"
                         title="View Details"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,13 +199,13 @@ const MySupport = () => {
                         </svg>
                       </button>
                     </div>
-                    <p className="text-gray-300 text-sm line-clamp-2">
+                    <p className="text-gray-700 text-sm line-clamp-2">
                       {item.type === 'query' ? item.message : item.description}
                     </p>
                     {(item.responses?.length > 0 || item.messages?.length > 0) && (
-                      <div className="mt-3 pt-3 border-t border-gray-800">
+                      <div className="mt-3 pt-3 border-t border-gray-100">
                         <p className="text-sm text-[#D4AF37]">
-                          {item.type === 'query' 
+                          {item.type === 'query'
                             ? `${item.responses.length} response(s)`
                             : `${item.messages.length} message(s)`
                           }
@@ -221,10 +221,10 @@ const MySupport = () => {
 
         {/* Detail Modal */}
         {showModal && selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-            <div className="bg-gray-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-800">
-              <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-white">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 shadow-2xl">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+                <h3 className="text-xl font-semibold text-black">
                   {selectedItem.type === 'query' ? 'Query Details' : 'Ticket Details'}
                 </h3>
                 <button
@@ -232,7 +232,7 @@ const MySupport = () => {
                     setShowModal(false);
                     setSelectedItem(null);
                   }}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-500 hover:text-black transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -244,7 +244,7 @@ const MySupport = () => {
                 {/* Header Info */}
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-lg font-semibold text-white mb-2">
+                    <h4 className="text-lg font-semibold text-black mb-2">
                       {selectedItem.type === 'query' ? selectedItem.subject : selectedItem.title}
                     </h4>
                     <div className="flex items-center gap-2 flex-wrap">
@@ -254,12 +254,12 @@ const MySupport = () => {
                       <span className={`px-3 py-1 text-sm rounded-full ${getPriorityColor(selectedItem.priority)}`}>
                         {selectedItem.priority}
                       </span>
-                      <span className="px-3 py-1 text-sm rounded-full bg-gray-700 text-gray-300">
+                      <span className="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-600 border border-gray-200">
                         {selectedItem.category}
                       </span>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-400">
+                  <div className="text-sm text-gray-500">
                     <p>Created: {formatDate(selectedItem.createdAt)}</p>
                     {selectedItem.updatedAt !== selectedItem.createdAt && (
                       <p>Updated: {formatDate(selectedItem.updatedAt)}</p>
@@ -269,8 +269,8 @@ const MySupport = () => {
 
                 {/* Content */}
                 <div>
-                  <h5 className="text-sm font-medium text-gray-400 mb-2">Description</h5>
-                  <p className="text-white bg-gray-800 rounded-lg p-4">
+                  <h5 className="text-sm font-medium text-gray-600 mb-2">Description</h5>
+                  <p className="text-black bg-gray-50 rounded-lg p-4 border border-gray-200">
                     {selectedItem.type === 'query' ? selectedItem.message : selectedItem.description}
                   </p>
                 </div>
@@ -278,10 +278,10 @@ const MySupport = () => {
                 {/* Responses/Messages */}
                 {selectedItem.type === 'query' && selectedItem.responses && selectedItem.responses.length > 0 && (
                   <div>
-                    <h5 className="text-sm font-medium text-gray-400 mb-3">Admin Responses</h5>
+                    <h5 className="text-sm font-medium text-gray-600 mb-3">Admin Responses</h5>
                     <div className="space-y-3">
                       {selectedItem.responses.map((response, index) => (
-                        <div key={index} className="bg-gray-800 rounded-lg p-4 border-l-4 border-[#D4AF37]">
+                        <div key={index} className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#D4AF37] shadow-sm">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-medium text-[#D4AF37]">
                               {response.senderName || 'Admin'}
@@ -290,7 +290,7 @@ const MySupport = () => {
                               {formatDate(response.createdAt)}
                             </span>
                           </div>
-                          <p className="text-white text-sm">{response.message}</p>
+                          <p className="text-gray-800 text-sm">{response.message}</p>
                         </div>
                       ))}
                     </div>
@@ -299,10 +299,10 @@ const MySupport = () => {
 
                 {selectedItem.type === 'ticket' && selectedItem.messages && selectedItem.messages.length > 0 && (
                   <div>
-                    <h5 className="text-sm font-medium text-gray-400 mb-3">Admin Messages</h5>
+                    <h5 className="text-sm font-medium text-gray-600 mb-3">Admin Messages</h5>
                     <div className="space-y-3">
                       {selectedItem.messages.map((message, index) => (
-                        <div key={index} className="bg-gray-800 rounded-lg p-4 border-l-4 border-[#D4AF37]">
+                        <div key={index} className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#D4AF37] shadow-sm">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-medium text-[#D4AF37]">
                               {message.senderName || 'Admin'}
@@ -311,7 +311,7 @@ const MySupport = () => {
                               {formatDate(message.createdAt)}
                             </span>
                           </div>
-                          <p className="text-white text-sm">{message.message}</p>
+                          <p className="text-gray-800 text-sm">{message.message}</p>
                         </div>
                       ))}
                     </div>
@@ -320,10 +320,10 @@ const MySupport = () => {
 
                 {((selectedItem.type === 'query' && (!selectedItem.responses || selectedItem.responses.length === 0)) ||
                   (selectedItem.type === 'ticket' && (!selectedItem.messages || selectedItem.messages.length === 0))) && (
-                  <div className="text-center py-4 text-gray-500 text-sm">
-                    No responses yet. Our team will get back to you soon.
-                  </div>
-                )}
+                    <div className="text-center py-4 text-gray-500 text-sm">
+                      No responses yet. Our team will get back to you soon.
+                    </div>
+                  )}
               </div>
             </div>
           </div>

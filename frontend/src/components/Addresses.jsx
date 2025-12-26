@@ -137,7 +137,7 @@ const Addresses = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!user?._id) {
       toast.error('User not found. Please login again.');
       navigate('/login');
@@ -225,29 +225,29 @@ const Addresses = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-white text-black pb-20 md:pb-0">
       {/* Header */}
-      <nav className="w-full bg-black border-b border-gray-800 sticky top-0 z-40">
+      <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate('/account')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
 
             <div className="flex items-center gap-2 md:gap-3">
               {logo && (
-                <img 
-                  src={logo} 
-                  alt="Vintage Beauty Logo" 
+                <img
+                  src={logo}
+                  alt="Vintage Beauty Logo"
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
                 My Addresses
               </h1>
             </div>
@@ -275,14 +275,14 @@ const Addresses = () => {
 
         {/* Add/Edit Address Form */}
         {isAdding && (
-          <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl md:rounded-2xl p-5 md:p-6 border border-gray-800 shadow-xl mb-6">
+          <div className="bg-white rounded-xl md:rounded-2xl p-5 md:p-6 border border-gray-200 shadow-xl mb-6">
             <div className="flex items-center justify-between mb-4 md:mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-white">
+              <h2 className="text-lg md:text-xl font-bold text-black">
                 {editingId ? 'Edit Address' : 'Add New Address'}
               </h2>
               <button
                 onClick={handleCancel}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-500 hover:text-black transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -293,26 +293,25 @@ const Addresses = () => {
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
               {/* Address Type */}
               <div>
-                <label className="block text-sm md:text-base text-gray-400 mb-2">
+                <label className="block text-sm md:text-base text-gray-700 mb-2">
                   Address Type
                 </label>
                 <div className="flex flex-wrap gap-2 md:gap-3">
                   {addressTypes.map((type) => {
                     const IconComponent = type.Icon;
                     return (
-                    <button
-                      key={type.value}
-                      type="button"
-                      onClick={() => handleTypeChange(type.value)}
-                        className={`flex-1 min-w-[100px] flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg border-2 transition-all duration-300 ${
-                        formData.type === type.value
-                          ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37]'
-                          : 'border-gray-700 hover:border-gray-600 text-gray-400'
-                      }`}
-                    >
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => handleTypeChange(type.value)}
+                        className={`flex-1 min-w-[100px] flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg border-2 transition-all duration-300 ${formData.type === type.value
+                            ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37]'
+                            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                          }`}
+                      >
                         <IconComponent className="w-5 h-5 md:w-5 md:h-5 flex-shrink-0" />
                         <span className="text-xs md:text-sm font-medium whitespace-nowrap">{type.label}</span>
-                    </button>
+                      </button>
                     );
                   })}
                 </div>
@@ -320,7 +319,7 @@ const Addresses = () => {
 
               {/* Name */}
               <div>
-                <label className="block text-sm md:text-base text-gray-400 mb-2">
+                <label className="block text-sm md:text-base text-gray-700 mb-2">
                   Full Name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -330,17 +329,17 @@ const Addresses = () => {
                   onChange={handleInputChange}
                   required
                   placeholder="Enter your full name"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm md:text-base text-gray-400 mb-2">
+                <label className="block text-sm md:text-base text-gray-700 mb-2">
                   Phone Number <span className="text-red-400">*</span>
                 </label>
-                <div className="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus-within:border-[#D4AF37] transition-colors">
-                  <span className="text-gray-400">+91</span>
+                <div className="flex items-center gap-2 bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 focus-within:border-[#D4AF37] transition-colors">
+                  <span className="text-gray-500">+91</span>
                   <input
                     type="tel"
                     name="phone"
@@ -349,14 +348,14 @@ const Addresses = () => {
                     required
                     placeholder="9876543210"
                     maxLength="10"
-                    className="flex-1 bg-transparent text-white placeholder-gray-500 focus:outline-none"
+                    className="flex-1 bg-transparent text-black placeholder-gray-400 focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Address */}
               <div>
-                <label className="block text-sm md:text-base text-gray-400 mb-2">
+                <label className="block text-sm md:text-base text-gray-700 mb-2">
                   Address <span className="text-red-400">*</span>
                 </label>
                 <textarea
@@ -366,13 +365,13 @@ const Addresses = () => {
                   required
                   rows="3"
                   placeholder="House/Flat No., Building Name, Street"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
                 />
               </div>
 
               {/* City */}
               <div>
-                <label className="block text-sm md:text-base text-gray-400 mb-2">
+                <label className="block text-sm md:text-base text-gray-700 mb-2">
                   City <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -382,14 +381,14 @@ const Addresses = () => {
                   onChange={handleInputChange}
                   required
                   placeholder="Enter city"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                 />
               </div>
 
               {/* State and Pincode */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm md:text-base text-gray-400 mb-2">
+                  <label className="block text-sm md:text-base text-gray-700 mb-2">
                     State <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -399,12 +398,12 @@ const Addresses = () => {
                     onChange={handleInputChange}
                     required
                     placeholder="Enter state"
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm md:text-base text-gray-400 mb-2">
+                  <label className="block text-sm md:text-base text-gray-700 mb-2">
                     Pincode <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -416,7 +415,7 @@ const Addresses = () => {
                     placeholder="400001"
                     maxLength="6"
                     pattern="[0-9]{6}"
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                   />
                 </div>
               </div>
@@ -426,7 +425,7 @@ const Addresses = () => {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300"
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-black font-medium px-6 py-3 rounded-lg transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -461,93 +460,93 @@ const Addresses = () => {
           <>
             {/* Addresses List */}
             {addresses.length === 0 && !isAdding ? (
-          <div className="text-center py-12 md:py-20">
-            <div className="mb-6">
-              <svg className="w-24 h-24 md:w-32 md:h-32 mx-auto text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4">No Addresses Yet</h2>
-            <p className="text-gray-400 mb-6 md:mb-8">Add your first address to get started!</p>
-            <button
-              onClick={() => setIsAdding(true)}
-              className="bg-[#D4AF37] hover:bg-[#F4D03F] text-black font-bold px-6 md:px-8 py-3 md:py-4 rounded-lg text-sm md:text-base transition-all duration-300 shadow-lg"
-            >
-              Add Address
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4 md:space-y-6">
-            {addresses.map((address) => (
-              <div
-                key={address._id || address.id}
-                className="bg-gradient-to-br from-gray-900 to-black rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-800 hover:border-[#D4AF37]/30 transition-all duration-300 shadow-lg"
-              >
-                <div className="flex items-start justify-between mb-3 md:mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
-                      {getAddressTypeIcon(address.type)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-base md:text-lg font-bold text-white">
-                          {address.name}
-                        </h3>
-                        {address.isDefault && (
-                          <span className="px-2 py-0.5 bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold rounded-full border border-[#D4AF37]/30">
-                            Default
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs md:text-sm text-gray-400">
-                        {getAddressTypeLabel(address.type)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {!address.isDefault && (
-                      <button
-                        onClick={() => handleSetDefault(address._id || address.id)}
-                        className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-[#D4AF37]"
-                        title="Set as default"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleEdit(address)}
-                      className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-[#D4AF37]"
-                      title="Edit address"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(address._id || address.id)}
-                      className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-red-400"
-                      title="Delete address"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
+              <div className="text-center py-12 md:py-20">
+                <div className="mb-6">
+                  <svg className="w-24 h-24 md:w-32 md:h-32 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                 </div>
-
-                <div className="space-y-1 text-sm md:text-base text-gray-300">
-                  <p>{address.phone}</p>
-                  <p>{address.address}</p>
-                  <p>{address.city}, {address.state} - {address.pincode}</p>
-                </div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-black">No Addresses Yet</h2>
+                <p className="text-gray-600 mb-6 md:mb-8">Add your first address to get started!</p>
+                <button
+                  onClick={() => setIsAdding(true)}
+                  className="bg-[#D4AF37] hover:bg-[#F4D03F] text-black font-bold px-6 md:px-8 py-3 md:py-4 rounded-lg text-sm md:text-base transition-all duration-300 shadow-lg"
+                >
+                  Add Address
+                </button>
               </div>
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="space-y-4 md:space-y-6">
+                {addresses.map((address) => (
+                  <div
+                    key={address._id || address.id}
+                    className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-200 hover:border-[#D4AF37]/50 transition-all duration-300 shadow-lg"
+                  >
+                    <div className="flex items-start justify-between mb-3 md:mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                          {getAddressTypeIcon(address.type)}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-base md:text-lg font-bold text-black">
+                              {address.name}
+                            </h3>
+                            {address.isDefault && (
+                              <span className="px-2 py-0.5 bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold rounded-full border border-[#D4AF37]/30">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs md:text-sm text-gray-600">
+                            {getAddressTypeLabel(address.type)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {!address.isDefault && (
+                          <button
+                            onClick={() => handleSetDefault(address._id || address.id)}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-[#D4AF37]"
+                            title="Set as default"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleEdit(address)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-[#D4AF37]"
+                          title="Edit address"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(address._id || address.id)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-red-500"
+                          title="Delete address"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1 text-sm md:text-base text-gray-700">
+                      <p>{address.phone}</p>
+                      <p>{address.address}</p>
+                      <p>{address.city}, {address.state} - {address.pincode}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

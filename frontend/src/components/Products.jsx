@@ -40,7 +40,7 @@ const Products = () => {
 
   // State for categories from API
   const [categoriesData, setCategoriesData] = useState([]);
-  
+
   // Function to convert slug to category name
   const getCategoryNameFromSlug = (slug) => {
     if (!categoriesData || categoriesData.length === 0) {
@@ -208,13 +208,13 @@ const Products = () => {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     const productId = product._id || product.id;
     const wasInWishlist = isInWishlist(productId);
-    
+
     try {
       await toggleItem(product);
-      
+
       if (wasInWishlist) {
         toast.success('Item removed from wishlist', {
           style: {
@@ -261,7 +261,7 @@ const Products = () => {
     }
     const stockValue = Number(product?.stock);
     const isOutOfStock = product?.inStock === false || (Number.isFinite(stockValue) && stockValue <= 0);
-    
+
     if (isOutOfStock) {
       toast.error('This item is out of stock', {
         style: {
@@ -273,7 +273,7 @@ const Products = () => {
       });
       return;
     }
-    
+
     try {
       await addItem(product, 1);
       toast.success(`${product.name} added to cart!`, {
@@ -303,18 +303,18 @@ const Products = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-black text-white overflow-x-hidden pb-20 md:pb-0"
+      className="min-h-screen bg-white text-black overflow-x-hidden pb-20 md:pb-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Toaster 
+      <Toaster
         position="top-center"
         toastOptions={{
           duration: 2000,
           style: {
-            background: '#1F1F1F',
-            color: '#fff',
+            background: '#ffffff',
+            color: '#000000',
             border: '1px solid #D4AF37',
             borderRadius: '8px',
           },
@@ -322,7 +322,7 @@ const Products = () => {
       />
       {/* Navigation Bar */}
       <motion.nav
-        className="w-full bg-black border-b border-gray-800 sticky top-0 z-50"
+        className="w-full bg-white border-b border-gray-200 sticky top-0 z-50"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -332,26 +332,25 @@ const Products = () => {
             {/* Logo/Brand Name - Left Section */}
             <div className="flex items-center gap-2 md:gap-3">
               {logo && (
-                <img 
-                  src={logo} 
-                  alt="VINTAGE BEAUTY Logo" 
+                <img
+                  src={logo}
+                  alt="VINTAGE BEAUTY Logo"
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-                <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
-                  VINTAGE BEAUTY
-                </h1>
-              </div>
+              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
+                VINTAGE BEAUTY
+              </h1>
+            </div>
 
             {/* Navigation Links - Desktop Only */}
             <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
               <Link
                 to="/"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Home'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Home'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Home
                 {activeNavTab === 'Home' && (
@@ -360,11 +359,10 @@ const Products = () => {
               </Link>
               <Link
                 to="/products"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Shop All'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Shop All'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Shop All
                 {activeNavTab === 'Shop All' && (
@@ -373,11 +371,10 @@ const Products = () => {
               </Link>
               <Link
                 to="/deals"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Deals'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Deals'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Deals
                 {activeNavTab === 'Deals' && (
@@ -386,11 +383,10 @@ const Products = () => {
               </Link>
               <Link
                 to="/account"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Account'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Account'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Account
                 {activeNavTab === 'Account' && (
@@ -402,12 +398,12 @@ const Products = () => {
             {/* Shopping Bag Icon */}
             <motion.button
               onClick={() => navigate('/cart')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative lg:absolute lg:right-0"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative lg:absolute lg:right-0"
               aria-label="Shopping Cart"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               {cartCount > 0 && (
@@ -422,7 +418,7 @@ const Products = () => {
 
       {/* Page Header */}
       <motion.div
-        className="w-full bg-black border-b border-gray-800 py-6 md:py-8"
+        className="w-full bg-white border-b border-gray-200 py-6 md:py-8"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -433,13 +429,13 @@ const Products = () => {
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">
                 {selectedCategory ? selectedCategory : 'All Products'}
               </h2>
-              <span className="text-white font-bold text-2xl md:text-3xl lg:text-4xl">
+              <span className="text-black font-bold text-2xl md:text-3xl lg:text-4xl">
                 ({totalProducts})
               </span>
             </div>
             {selectedCategory ? (
               <div className="flex items-center gap-3">
-                <p className="text-center text-gray-400">
+                <p className="text-center text-gray-600">
                   Showing {products.length} {products.length === 1 ? 'product' : 'products'} in {selectedCategory}
                 </p>
                 <button
@@ -453,7 +449,7 @@ const Products = () => {
                 </button>
               </div>
             ) : (
-              <p className="text-center text-gray-400">
+              <p className="text-center text-gray-600">
                 Discover our complete collection
               </p>
             )}
@@ -463,7 +459,7 @@ const Products = () => {
 
       {/* Products Grid */}
       <motion.section
-        className="w-full bg-black py-8 md:py-12"
+        className="w-full bg-white py-8 md:py-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
@@ -508,10 +504,10 @@ const Products = () => {
                     <Link
                       to={`/product/${productId}`}
                       onClick={() => trackProductView(product)}
-                      className="bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group relative block"
+                      className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group relative block border border-gray-200"
                     >
                       {/* Product Image */}
-                      <div className="relative h-36 md:h-48 lg:h-56 bg-gray-800 overflow-hidden">
+                      <div className="relative h-36 md:h-48 lg:h-56 bg-gray-100 overflow-hidden">
                         <LazyImage
                           src={product.image || heroimg}
                           alt={product.name || 'Product'}
@@ -519,19 +515,18 @@ const Products = () => {
                           placeholder={heroimg}
                           priority={isPriorityImage}
                         />
-                        
+
                         {/* Wishlist Heart Icon */}
                         <button
                           onClick={(e) => handleWishlistToggle(product, e)}
-                          className="absolute top-3 right-3 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all duration-300 z-20"
+                          className="absolute top-3 right-3 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all duration-300 z-20 shadow-sm"
                           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                         >
                           <svg
-                            className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-300 ${
-                              inWishlist
-                                ? 'text-red-500 fill-red-500'
-                                : 'text-white hover:text-red-400'
-                            }`}
+                            className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-300 ${inWishlist
+                              ? 'text-red-500 fill-red-500'
+                              : 'text-gray-400 hover:text-red-400'
+                              }`}
                             fill={inWishlist ? 'currentColor' : 'none'}
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -547,19 +542,19 @@ const Products = () => {
                       </div>
 
                       {/* Product Info */}
-                      <div className="p-3 md:p-4 bg-gray-900">
+                      <div className="p-3 md:p-4 bg-white">
                         {/* Name and Price in one row */}
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <h4 className="text-sm md:text-base font-semibold text-white flex-1 truncate">
+                          <h4 className="text-sm md:text-base font-semibold text-black flex-1 truncate">
                             {product.name}
                           </h4>
-                          <p className="text-xs md:text-sm font-bold text-white whitespace-nowrap">
+                          <p className="text-xs md:text-sm font-bold text-black whitespace-nowrap">
                             {product.displayPrice}
                           </p>
                         </div>
-                        
+
                         {/* Description */}
-                        <p className="text-xs text-gray-400 line-clamp-2 mb-2">
+                        <p className="text-xs text-gray-600 line-clamp-2 mb-2">
                           {product.description}
                         </p>
 
@@ -570,13 +565,13 @@ const Products = () => {
                               {product.sizes.slice(0, 3).map((size, idx) => (
                                 <span
                                   key={idx}
-                                  className="text-[10px] px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded border border-gray-600"
+                                  className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded border border-gray-200"
                                 >
                                   {size.size}
                                 </span>
                               ))}
                               {product.sizes.length > 3 && (
-                                <span className="text-[10px] px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded border border-gray-600">
+                                <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded border border-gray-200">
                                   +{product.sizes.length - 3}
                                 </span>
                               )}
@@ -589,14 +584,13 @@ const Products = () => {
                         )}
 
                         {/* Add to Cart Button */}
-                        <button 
+                        <button
                           onClick={(e) => handleAddToCart(product, e)}
                           disabled={isOutOfStock}
-                          className={`w-full mt-2 font-bold px-2 py-1.5 rounded-lg text-[10px] md:text-xs transition-all duration-300 shadow-md ${
-                            isOutOfStock
-                              ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
-                              : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black hover:shadow-lg'
-                          }`}
+                          className={`w-full mt-2 font-bold px-2 py-1.5 rounded-lg text-[10px] md:text-xs transition-all duration-300 shadow-md ${isOutOfStock
+                            ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
+                            : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black hover:shadow-lg'
+                            }`}
                         >
                           {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                         </button>
@@ -606,7 +600,7 @@ const Products = () => {
                 );
               }) : (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-400 text-lg">No products found</p>
+                  <p className="text-gray-500 text-lg">No products found</p>
                 </div>
               )}
             </motion.div>

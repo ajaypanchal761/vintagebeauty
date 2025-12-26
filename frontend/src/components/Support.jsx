@@ -34,7 +34,7 @@ const Support = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (activeTab === 'query') {
       if (!formData.subject.trim() || !formData.message.trim()) {
@@ -71,7 +71,7 @@ const Support = () => {
 
       if (response.success) {
         toast.success(response.message || `${activeTab === 'query' ? 'Query' : 'Ticket'} submitted successfully!`);
-        
+
         // Reset form
         setFormData({
           subject: '',
@@ -99,18 +99,18 @@ const Support = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden pb-20 md:pb-0">
+    <div className="min-h-screen bg-white text-black overflow-x-hidden pb-20 md:pb-0">
       {/* Navigation Bar */}
-      <nav className="w-full bg-black border-b border-gray-800 sticky top-0 z-50">
+      <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
             {/* Back Button */}
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Back"
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -118,13 +118,13 @@ const Support = () => {
             {/* Logo/Brand Name */}
             <div className="flex items-center gap-2 md:gap-3">
               {logo && (
-                <img 
-                  src={logo} 
-                  alt="VINTAGE BEAUTY Logo" 
+                <img
+                  src={logo}
+                  alt="VINTAGE BEAUTY Logo"
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
                 Help & Support
               </h1>
             </div>
@@ -132,10 +132,10 @@ const Support = () => {
             {/* Shopping Bag Icon */}
             <button
               onClick={() => navigate('/cart')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
               aria-label="Shopping Cart"
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </button>
@@ -146,16 +146,15 @@ const Support = () => {
       {/* Page Content */}
       <div className="container mx-auto px-4 md:px-6 py-6 md:py-8 max-w-3xl">
         {/* Tabs */}
-        <div className="bg-gray-900 rounded-xl mb-6 border border-gray-800">
-          <div className="border-b border-gray-800">
+        <div className="bg-white rounded-xl mb-6 border border-gray-200 shadow-sm">
+          <div className="border-b border-gray-200">
             <nav className="flex">
               <button
                 onClick={() => setActiveTab('query')}
-                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-                  activeTab === 'query'
-                    ? 'text-[#D4AF37] border-b-2 border-[#D4AF37] bg-gray-800'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${activeTab === 'query'
+                    ? 'text-[#D4AF37] border-b-2 border-[#D4AF37] bg-gray-50'
+                    : 'text-gray-600 hover:text-black hover:bg-gray-50'
+                  }`}
               >
                 <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -164,11 +163,10 @@ const Support = () => {
               </button>
               <button
                 onClick={() => setActiveTab('ticket')}
-                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-                  activeTab === 'ticket'
-                    ? 'text-[#D4AF37] border-b-2 border-[#D4AF37] bg-gray-800'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${activeTab === 'ticket'
+                    ? 'text-[#D4AF37] border-b-2 border-[#D4AF37] bg-gray-50'
+                    : 'text-gray-600 hover:text-black hover:bg-gray-50'
+                  }`}
               >
                 <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
@@ -180,14 +178,14 @@ const Support = () => {
         </div>
 
         {/* Form */}
-        <div className="bg-gray-900 rounded-xl p-6 md:p-8 border border-gray-800">
+        <div className="bg-white rounded-xl p-6 md:p-8 border border-gray-200 shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Contact Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white mb-4">Contact Information</h3>
-              
+              <h3 className="text-lg font-semibold text-black mb-4">Contact Information</h3>
+
               <div>
-                <label htmlFor="customerName" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-2">
                   Name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -197,14 +195,14 @@ const Support = () => {
                   value={formData.customerName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                   placeholder="Your full name"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-700 mb-2">
                     Email <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -214,13 +212,13 @@ const Support = () => {
                     value={formData.customerEmail}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                     placeholder="your@email.com"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-2">
                     Phone
                   </label>
                   <input
@@ -229,7 +227,7 @@ const Support = () => {
                     name="customerPhone"
                     value={formData.customerPhone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                     placeholder="Your phone number"
                   />
                 </div>
@@ -240,7 +238,7 @@ const Support = () => {
             {activeTab === 'query' && (
               <>
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
                     Subject <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -250,13 +248,13 @@ const Support = () => {
                     value={formData.subject}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                     placeholder="What is your query about?"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
                     Message <span className="text-red-400">*</span>
                   </label>
                   <textarea
@@ -266,7 +264,7 @@ const Support = () => {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
                     placeholder="Please describe your query in detail..."
                   />
                 </div>
@@ -277,7 +275,7 @@ const Support = () => {
             {activeTab === 'ticket' && (
               <>
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                     Ticket Title <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -287,13 +285,13 @@ const Support = () => {
                     value={formData.title}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                     placeholder="Brief title for your ticket"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                     Description <span className="text-red-400">*</span>
                   </label>
                   <textarea
@@ -303,7 +301,7 @@ const Support = () => {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none"
                     placeholder="Please describe your issue in detail..."
                   />
                 </div>
@@ -313,7 +311,7 @@ const Support = () => {
             {/* Category and Priority */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                   Category
                 </label>
                 <select
@@ -321,7 +319,7 @@ const Support = () => {
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black focus:outline-none focus:border-[#D4AF37] transition-colors"
                 >
                   <option value="general">General</option>
                   <option value="technical">Technical</option>
@@ -333,7 +331,7 @@ const Support = () => {
               </div>
 
               <div>
-                <label htmlFor="priority" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
                   Priority
                 </label>
                 <select
@@ -341,7 +339,7 @@ const Support = () => {
                   name="priority"
                   value={formData.priority}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-black focus:outline-none focus:border-[#D4AF37] transition-colors"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>

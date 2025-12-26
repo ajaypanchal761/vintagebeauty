@@ -115,9 +115,9 @@ const Deals = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden pb-20 md:pb-0">
+    <div className="min-h-screen bg-white text-black overflow-x-hidden pb-20 md:pb-0">
       {/* Navigation Bar */}
-      <nav className="w-full bg-black border-b border-gray-800 sticky top-0 z-50">
+      <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between lg:relative lg:flex lg:items-center">
             {/* Logo/Brand Name - Left Section */}
@@ -129,7 +129,7 @@ const Deals = () => {
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
                 VINTAGE BEAUTY
               </h1>
             </div>
@@ -138,11 +138,10 @@ const Deals = () => {
             <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
               <Link
                 to="/"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Home'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Home'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Home
                 {activeNavTab === 'Home' && (
@@ -151,11 +150,10 @@ const Deals = () => {
               </Link>
               <Link
                 to="/products"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Shop All'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Shop All'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Shop All
                 {activeNavTab === 'Shop All' && (
@@ -164,11 +162,10 @@ const Deals = () => {
               </Link>
               <Link
                 to="/deals"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Deals'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Deals'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Deals
                 {activeNavTab === 'Deals' && (
@@ -177,11 +174,10 @@ const Deals = () => {
               </Link>
               <Link
                 to="/account"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Account'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Account'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Account
                 {activeNavTab === 'Account' && (
@@ -196,7 +192,7 @@ const Deals = () => {
               className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative"
               aria-label="Shopping Cart"
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               {cartItemCount > 0 && (
@@ -210,26 +206,26 @@ const Deals = () => {
       </nav>
 
       {/* Top Promotional Banner */}
-      <div className="bg-black text-white py-3 md:py-4 relative overflow-hidden border-b border-[#D4AF37]/20">
+      <div className="bg-gray-100 text-black py-3 md:py-4 relative overflow-hidden border-b border-gray-200">
         <div className="flex items-center justify-center relative min-h-[40px]">
-          <button 
+          <button
             onClick={() => setCurrentOffer((prev) => (prev === 0 ? offers.length - 1 : prev - 1))}
             className="absolute left-2 md:left-4 z-10 p-1.5 flex items-center justify-center"
           >
-            <svg className="w-5 h-5 text-gray-400 hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
+
           <div className="text-xs md:text-sm font-medium text-center px-10 md:px-16 w-full max-w-full flex items-center justify-center text-[#D4AF37]">
             {offers[currentOffer]}
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setCurrentOffer((prev) => (prev === offers.length - 1 ? 0 : prev + 1))}
             className="absolute right-2 md:right-4 z-10 p-1.5 flex items-center justify-center"
           >
-            <svg className="w-5 h-5 text-gray-400 hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -240,8 +236,8 @@ const Deals = () => {
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Section Heading */}
         <div className="text-center mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">Combo Deals</h1>
-          <p className="text-sm md:text-base text-gray-400">Build your own box and save more!</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black mb-2">Combo Deals</h1>
+          <p className="text-sm md:text-base text-gray-600">Build your own box and save more!</p>
         </div>
 
         {/* Bundle Cards Grid */}
@@ -252,57 +248,57 @@ const Deals = () => {
         ) : (
           <div className="grid grid-cols-2 gap-3 md:gap-4 lg:gap-6 max-w-5xl mx-auto">
             {bundleCards.map((card) => (
-            <div 
-              key={card.id} 
-              className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl overflow-hidden relative p-3 md:p-4 shadow-lg border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:shadow-2xl"
-            >
-              <div className="flex flex-col items-center text-center">
-                {/* Deal Highlight */}
-                <div className="mb-2 md:mb-3">
-                  <p className="text-[10px] md:text-xs text-[#D4AF37] font-bold leading-tight">{card.dealHighlight}</p>
-                </div>
-                
-                {/* Product Image Container with Golden Pedestal */}
-                <div className="relative mb-2 md:mb-3 w-full flex items-center justify-center">
-                  {/* Golden Circular Pedestal */}
-                  <div className="relative w-20 h-20 md:w-28 md:h-28">
-                    {/* Golden base circle */}
-                    <div className="absolute inset-2 md:inset-3 bg-gradient-to-br from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] rounded-full shadow-lg"></div>
-                    {/* Products on pedestal */}
-                    <div className="absolute inset-2 overflow-hidden rounded-full">
-                      <img 
-                        src={card.image} 
-                        alt={card.title}
-                        className="w-full h-full object-cover"
-                      />
+              <div
+                key={card.id}
+                className="bg-white rounded-xl overflow-hidden relative p-3 md:p-4 shadow-lg border border-gray-200 hover:border-[#D4AF37]/40 transition-all duration-300 hover:shadow-2xl"
+              >
+                <div className="flex flex-col items-center text-center">
+                  {/* Deal Highlight */}
+                  <div className="mb-2 md:mb-3">
+                    <p className="text-[10px] md:text-xs text-[#D4AF37] font-bold leading-tight">{card.dealHighlight}</p>
+                  </div>
+
+                  {/* Product Image Container with Golden Pedestal */}
+                  <div className="relative mb-2 md:mb-3 w-full flex items-center justify-center">
+                    {/* Golden Circular Pedestal */}
+                    <div className="relative w-20 h-20 md:w-28 md:h-28">
+                      {/* Golden base circle */}
+                      <div className="absolute inset-2 md:inset-3 bg-gradient-to-br from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] rounded-full shadow-lg"></div>
+                      {/* Products on pedestal */}
+                      <div className="absolute inset-2 overflow-hidden rounded-full">
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Title */}
-                <h3 className="text-xs md:text-sm font-bold text-white mb-0.5">{card.title}</h3>
-                
-                {/* Description */}
-                <p className="text-[10px] md:text-xs text-gray-400 mb-2">{card.description}</p>
-                
-                {/* Pricing */}
-                <div className="mb-2 md:mb-3">
-                  <div className="flex items-baseline justify-center gap-1.5">
-                    <span className="text-sm md:text-base font-bold text-[#D4AF37]">{card.currentPrice}</span>
-                    <span className="text-[10px] md:text-xs text-gray-500 line-through">{card.originalPrice}</span>
-                    <span className="text-[10px] md:text-xs text-green-400 font-semibold">{card.discount}</span>
+
+                  {/* Title */}
+                  <h3 className="text-xs md:text-sm font-bold text-black mb-0.5">{card.title}</h3>
+
+                  {/* Description */}
+                  <p className="text-[10px] md:text-xs text-gray-600 mb-2">{card.description}</p>
+
+                  {/* Pricing */}
+                  <div className="mb-2 md:mb-3">
+                    <div className="flex items-baseline justify-center gap-1.5">
+                      <span className="text-sm md:text-base font-bold text-[#D4AF37]">{card.currentPrice}</span>
+                      <span className="text-[10px] md:text-xs text-gray-500 line-through">{card.originalPrice}</span>
+                      <span className="text-[10px] md:text-xs text-green-400 font-semibold">{card.discount}</span>
+                    </div>
                   </div>
+
+                  {/* Build Your Box Button */}
+                  <Link
+                    to={`/combo-deals/${card.id}`}
+                    className="w-full border-2 border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black px-3 py-1.5 md:py-2 rounded-md text-[10px] md:text-xs font-semibold transition-all duration-300 block text-center"
+                  >
+                    Build Your Box
+                  </Link>
                 </div>
-                
-                {/* Build Your Box Button */}
-                <Link 
-                  to={`/combo-deals/${card.id}`}
-                  className="w-full border-2 border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black px-3 py-1.5 md:py-2 rounded-md text-[10px] md:text-xs font-semibold transition-all duration-300 block text-center"
-                >
-                  Build Your Box
-                </Link>
               </div>
-            </div>
             ))}
           </div>
         )}

@@ -48,14 +48,14 @@ const Account = () => {
     let isMounted = true;
     let retryCount = 0;
     const maxRetries = 2;
-    
+
     const fetchData = async (isRetry = false) => {
       // Wait for Zustand to fully hydrate and token to be available
       // Increased delay to ensure everything is ready
       if (!isRetry) {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
-      
+
       // Verify token still exists before making request
       const verifyToken = localStorage.getItem('token');
       if (!verifyToken) {
@@ -65,12 +65,12 @@ const Account = () => {
         }
         return;
       }
-      
+
       try {
         if (!authUser && !isRetry) {
           setLoading(true);
         }
-        
+
         // Log token status for debugging
         if (import.meta.env.DEV) {
           console.log('Fetching user data with token:', {
@@ -79,7 +79,7 @@ const Account = () => {
             tokenPrefix: verifyToken.substring(0, 20) + '...'
           });
         }
-        
+
         const response = await userService.getCurrentUser();
         if (isMounted && response.success) {
           const userData = response.data;
@@ -97,23 +97,23 @@ const Account = () => {
       } catch (error) {
         if (isMounted) {
           console.error('Failed to fetch user profile:', error);
-          
+
           // Handle 401 errors - token is invalid/expired
           if (error.response?.status === 401) {
             // Check if this is a recent login (within grace period)
             const loginTimestamp = localStorage.getItem('loginTimestamp');
             const timeSinceLogin = loginTimestamp ? Date.now() - parseInt(loginTimestamp) : Infinity;
             const isRecentLogin = timeSinceLogin < 10000; // 10 second grace period
-            
+
             // Check if token still exists
             const tokenStillExists = localStorage.getItem('token');
-            
+
             if (isRecentLogin && tokenStillExists && retryCount < maxRetries) {
               // Recent login, might be timing issue - retry with exponential backoff
               retryCount++;
               const retryDelay = 1000 * retryCount; // 1s, 2s
               console.warn(`401 on /users/me after recent login, retrying (${retryCount}/${maxRetries}) in ${retryDelay}ms...`);
-              
+
               setTimeout(async () => {
                 if (isMounted && localStorage.getItem('token')) {
                   // Verify token still exists before retry
@@ -153,7 +153,7 @@ const Account = () => {
           } else {
             // For other errors, show the actual error message
             const errorMessage = error.message || error.response?.data?.message || 'Failed to load profile';
-            
+
             // Log error details for debugging
             if (import.meta.env.DEV) {
               console.error('Account component error:', {
@@ -162,7 +162,7 @@ const Account = () => {
                 response: error.response?.data
               });
             }
-            
+
             // Show toast with actual error message
             toast.error(errorMessage);
           }
@@ -212,7 +212,7 @@ const Account = () => {
         name: profileFormData.name.trim(),
         email: profileFormData.email.trim()
       });
-      
+
       if (response.success) {
         setUser(response.data);
         // Update auth store with new user data
@@ -225,10 +225,10 @@ const Account = () => {
       }
     } catch (error) {
       console.error('Update profile error:', error);
-      
+
       // Show actual error message
       const errorMessage = error.message || error.response?.data?.message || 'Failed to update profile';
-      
+
       // Log error details for debugging
       if (import.meta.env.DEV) {
         console.error('Update profile error details:', {
@@ -237,7 +237,7 @@ const Account = () => {
           response: error.response?.data
         });
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setIsSavingProfile(false);
@@ -352,14 +352,14 @@ const Account = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-white text-black pb-20 md:pb-0">
       {/* Header */}
-      <nav className="w-full bg-black border-b border-gray-800 sticky top-0 z-40">
+      <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate('/')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -368,13 +368,13 @@ const Account = () => {
 
             <div className="flex items-center gap-2 md:gap-3">
               {logo && (
-                <img 
-                  src={logo} 
-                  alt="Vintage Beauty Logo" 
+                <img
+                  src={logo}
+                  alt="Vintage Beauty Logo"
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
                 Account
               </h1>
             </div>
@@ -392,7 +392,7 @@ const Account = () => {
         ) : (
           <>
             {/* Profile Section */}
-            <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl md:rounded-3xl p-4 md:p-6 mb-4 md:mb-6 border border-gray-800 shadow-xl">
+            <div className="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 mb-4 md:mb-6 border border-gray-200 shadow-xl">
               {!isEditingProfile ? (
                 <div className="flex items-center gap-3 md:gap-4">
                   {/* Profile Avatar */}
@@ -402,7 +402,7 @@ const Account = () => {
                         {getInitials(user?.name)}
                       </span>
                     </div>
-                    <button 
+                    <button
                       onClick={handleEditProfile}
                       className="absolute bottom-0 right-0 bg-[#D4AF37] text-black rounded-full p-1.5 md:p-2 shadow-lg hover:bg-amber-500 transition-colors"
                       title="Edit avatar"
@@ -415,13 +415,13 @@ const Account = () => {
 
                   {/* User Info */}
                   <div className="flex-1">
-                    <h2 className="text-lg md:text-2xl font-bold text-white mb-1">
+                    <h2 className="text-lg md:text-2xl font-bold text-black mb-1">
                       {user?.name || 'User'}
                     </h2>
-                    <p className="text-sm md:text-base text-gray-400 mb-2">
+                    <p className="text-sm md:text-base text-gray-600 mb-2">
                       {user?.email || 'No email provided'}
                     </p>
-                    <button 
+                    <button
                       onClick={handleEditProfile}
                       className="text-xs md:text-sm text-[#D4AF37] hover:text-amber-400 font-medium transition-colors"
                     >
@@ -438,12 +438,12 @@ const Account = () => {
                       </span>
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-lg md:text-2xl font-bold text-white mb-2">Edit Profile</h2>
+                      <h2 className="text-lg md:text-2xl font-bold text-black mb-2">Edit Profile</h2>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm md:text-base text-gray-400 mb-2">
+                    <label className="block text-sm md:text-base text-gray-600 mb-2">
                       Full Name <span className="text-red-400">*</span>
                     </label>
                     <input
@@ -452,12 +452,12 @@ const Account = () => {
                       onChange={(e) => setProfileFormData({ ...profileFormData, name: e.target.value })}
                       required
                       placeholder="Enter your full name"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm md:text-base text-gray-400 mb-2">
+                    <label className="block text-sm md:text-base text-gray-600 mb-2">
                       Email Address <span className="text-red-400">*</span>
                     </label>
                     <input
@@ -466,7 +466,7 @@ const Account = () => {
                       onChange={(e) => setProfileFormData({ ...profileFormData, email: e.target.value })}
                       required
                       placeholder="your.email@example.com"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                      className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-black placeholder-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors"
                     />
                   </div>
 
@@ -474,7 +474,7 @@ const Account = () => {
                     <button
                       type="button"
                       onClick={handleCancelEdit}
-                      className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300"
+                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-black font-medium px-6 py-3 rounded-lg transition-all duration-300"
                     >
                       Cancel
                     </button>
@@ -505,34 +505,31 @@ const Account = () => {
         {/* Options List */}
         {!loading && (
           <div className="space-y-2 md:space-y-3">
-          {accountOptions.map((option, index) => (
-            <button
-              key={option.id}
-              onClick={option.onClick}
-              className={`w-full flex items-center gap-3 md:gap-4 px-4 md:px-6 py-3 md:py-4 bg-gray-900 hover:bg-gray-800 rounded-xl md:rounded-2xl transition-all duration-200 border border-gray-800 hover:border-[#D4AF37]/30 group ${
-                option.isDestructive ? 'hover:bg-red-900/20 hover:border-red-500/30' : ''
-              }`}
-            >
-              <div className={`flex-shrink-0 ${option.isDestructive ? 'text-red-400' : 'text-[#D4AF37]'} group-hover:scale-110 transition-transform`}>
-                {option.icon}
-              </div>
-              <span className={`flex-1 text-left text-sm md:text-base font-medium ${
-                option.isDestructive ? 'text-red-400' : 'text-white'
-              }`}>
-                {option.title}
-              </span>
-              <svg 
-                className={`w-4 h-4 md:w-5 md:h-5 text-gray-500 group-hover:text-[#D4AF37] transition-colors ${
-                  option.isDestructive ? 'group-hover:text-red-400' : ''
-                }`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
+            {accountOptions.map((option, index) => (
+              <button
+                key={option.id}
+                onClick={option.onClick}
+                className={`w-full flex items-center gap-3 md:gap-4 px-4 md:px-6 py-3 md:py-4 bg-white hover:bg-gray-50 rounded-xl md:rounded-2xl transition-all duration-200 border border-gray-200 hover:border-[#D4AF37]/30 group ${option.isDestructive ? 'hover:bg-red-50 hover:border-red-200' : ''
+                  }`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          ))}
+                <div className={`flex-shrink-0 ${option.isDestructive ? 'text-red-400' : 'text-[#D4AF37]'} group-hover:scale-110 transition-transform`}>
+                  {option.icon}
+                </div>
+                <span className={`flex-1 text-left text-sm md:text-base font-medium ${option.isDestructive ? 'text-red-500' : 'text-black'
+                  }`}>
+                  {option.title}
+                </span>
+                <svg
+                  className={`w-4 h-4 md:w-5 md:h-5 text-gray-500 group-hover:text-[#D4AF37] transition-colors ${option.isDestructive ? 'group-hover:text-red-400' : ''
+                    }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ))}
           </div>
         )}
 

@@ -14,6 +14,60 @@ import heroimg from '../assets/heroimg.png';
 import toast from 'react-hot-toast';
 import { trackCategoryVisit, trackAddToCart, trackProductView } from '../utils/activityTracker';
 
+
+const PerfumeImageSlideshow = () => {
+  const [images, setImages] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await productsService.getAll({ category: 'perfume', limit: 50 });
+        if (response.success && (response.products || response.data)) {
+          const products = response.products || response.data;
+          const validImages = products
+            .map(p => p.images?.[0] || p.image)
+            .filter(img => img && typeof img === 'string' && img.length > 0);
+
+          if (validImages.length > 0) {
+            setImages(validImages);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch perfume images for slideshow', err);
+      }
+    };
+    fetchImages();
+  }, []);
+
+  useEffect(() => {
+    if (images.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % images.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [images]);
+
+  const currentImage = images.length > 0 ? images[currentIndex] : heroimg;
+
+  return (
+    <div className="absolute -right-4 md:right-4 lg:right-12 w-[200px] h-[200px] md:w-[300px] md:h-[300px] lg:w-[380px] lg:h-[380px] rounded-full border-4 border-[#D4AF37] overflow-hidden bg-white/40 shadow-[0_0_20px_rgba(212,175,55,0.3)] z-0 flex items-center justify-center">
+      <motion.img
+        key={currentImage}
+        src={currentImage}
+        alt="Cosmetic Body Spray"
+        className="w-full h-full object-cover"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        onError={(e) => {
+          if (e.target.src !== heroimg) e.target.src = heroimg;
+        }}
+      />
+    </div>
+  );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,11 +93,11 @@ const Home = () => {
 
   // Get category names from API data or fallback to empty array
   const categoryNames = categoriesData.map(cat => cat.name) || [];
-  
+
   // State for products
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  
+
   // Cache for prefetched products by category
   const [productsCache, setProductsCache] = useState({});
 
@@ -56,12 +110,12 @@ const Home = () => {
     if (!categoriesData || categoriesData.length === 0) {
       return heroimg; // Fallback to static image if categories not loaded
     }
-    
+
     // Find category by name (case-insensitive)
-    const category = categoriesData.find(cat => 
+    const category = categoriesData.find(cat =>
       cat.name?.toLowerCase() === categoryName.toLowerCase()
     );
-    
+
     // Return category image if available, otherwise fallback
     return category?.image || heroimg;
   }, [categoriesData]);
@@ -125,14 +179,14 @@ const Home = () => {
   const prefetchCategoryProducts = useCallback(async (category) => {
     if (category === activeCategory) return; // Don't prefetch if already active
     if (productsCache[category]) return; // Already cached
-    
+
     try {
       const categorySlug = getCategorySlug(category);
       const response = await productsService.getAll({
         category: categorySlug,
         limit: 8
       });
-      
+
       const productsArray = response.products || response.data || [];
       if (response.success && productsArray.length > 0) {
         const processedProducts = processProducts(productsArray);
@@ -165,20 +219,20 @@ const Home = () => {
       setLoadingProducts(true);
       try {
         const categorySlug = getCategorySlug(activeCategory);
-        
+
         // Use centralized API - products service
         const response = await productsService.getAll({
           category: categorySlug,
           limit: 8
         });
-        
+
         // Get products array from response
         const productsArray = response.products || response.data || [];
-        
+
         if (response.success && productsArray.length > 0) {
           const processedProducts = processProducts(productsArray);
           setProducts(processedProducts);
-          
+
           // Cache the products for future use
           setProductsCache(prev => ({
             ...prev,
@@ -259,7 +313,7 @@ const Home = () => {
               (Array.isArray(displayLocation) && displayLocation.length === 0 && announcement.type === 'promotion')
             );
           });
-          
+
           // Sort by priority (high > medium > low) and then by creation date
           const sortedAnnouncements = homeAnnouncements.sort((a, b) => {
             const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
@@ -267,7 +321,7 @@ const Home = () => {
             if (priorityDiff !== 0) return priorityDiff;
             return new Date(b.createdAt) - new Date(a.createdAt);
           });
-          
+
           setPromotionalAnnouncements(sortedAnnouncements);
         }
       } catch (error) {
@@ -345,7 +399,7 @@ const Home = () => {
               buttonText: item.buttonText || 'SHOP NOW',
               order: item.order !== undefined ? item.order : index
             })).sort((a, b) => (a.order || 0) - (b.order || 0));
-            
+
             setBannerSlides(mappedSlides);
           } else {
             // No fallback - use empty array if API returns empty
@@ -490,7 +544,7 @@ const Home = () => {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 h-full flex flex-col justify-center gap-3 md:gap-4 px-5 md:px-10 lg:px-14 py-6 md:py-8">
+        <div className="relative z-10 h-full flex flex-col justify-center gap-2 md:gap-4 px-4 md:px-10 lg:px-14 py-4 md:py-8">
           {/* Top Badge */}
           <motion.div
             className="self-start"
@@ -498,15 +552,15 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black px-4 py-2 rounded-lg border-2 border-black shadow-lg">
-              <span className="text-xs md:text-sm font-bold uppercase tracking-wider">{currentBanner.badge}</span>
+            <div className="bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-black px-2 py-1 md:px-4 md:py-2 rounded-md md:rounded-lg border border-black md:border-2 shadow-lg">
+              <span className="text-[10px] md:text-sm font-bold uppercase tracking-wider">{currentBanner.badge}</span>
             </div>
           </motion.div>
 
           {/* Main Content - Left Side */}
-          <div className="flex flex-col justify-center max-w-xl md:max-w-2xl">
+          <div className="flex flex-col justify-center max-w-[55%] md:max-w-2xl">
             <motion.h2
-              className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2 md:mb-3 leading-tight"
+              className="text-base md:text-4xl lg:text-5xl font-bold text-white mb-1 md:mb-3 leading-tight"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -514,7 +568,7 @@ const Home = () => {
               {currentBanner.tagline}
             </motion.h2>
             <motion.p
-              className="text-sm md:text-lg lg:text-xl text-[#D4AF37] font-semibold mb-3 md:mb-4 max-w-md"
+              className="text-[10px] md:text-lg lg:text-xl text-[#D4AF37] font-semibold mb-2 md:mb-4 max-w-[90%] md:max-w-md"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -540,11 +594,10 @@ const Home = () => {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === currentSlide
-                    ? 'w-8 bg-[#D4AF37]'
-                    : 'w-2 bg-white/50 hover:bg-white/75'
-                }`}
+                className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide
+                  ? 'w-8 bg-[#D4AF37]'
+                  : 'w-2 bg-white/50 hover:bg-white/75'
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -599,10 +652,10 @@ const Home = () => {
       <div className="w-full">
         {/* Section Header */}
         <div className="text-center mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black mb-2">
             Exclusive <span className="text-[#D4AF37]">Deals</span>
           </h2>
-          <p className="text-gray-400 text-sm md:text-base">Choose your perfect combo and save more</p>
+          <p className="text-gray-600 text-sm md:text-base">Choose your perfect combo and save more</p>
         </div>
 
         {/* Deal Cards Grid */}
@@ -610,7 +663,7 @@ const Home = () => {
           {dealCards.map((card) => (
             <motion.div
               key={card.id}
-              className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl overflow-hidden relative p-3 md:p-4 shadow-lg border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-300 hover:shadow-2xl"
+              className="bg-white rounded-xl overflow-hidden relative p-3 md:p-4 shadow-lg border border-gray-200 hover:border-[#D4AF37]/40 transition-all duration-300 hover:shadow-2xl"
               whileHover={{ scale: 1.02, y: -5 }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -621,7 +674,7 @@ const Home = () => {
                 <div className="mb-2 md:mb-3">
                   <p className="text-[10px] md:text-xs text-[#D4AF37] font-bold leading-tight">{card.dealHighlight}</p>
                 </div>
-                
+
                 {/* Product Image Container with Golden Pedestal */}
                 <div className="relative mb-2 md:mb-3 w-full flex items-center justify-center">
                   <div className="relative w-20 h-20 md:w-28 md:h-28">
@@ -629,21 +682,21 @@ const Home = () => {
                     <div className="absolute inset-2 md:inset-3 bg-gradient-to-br from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] rounded-full shadow-lg"></div>
                     {/* Products on pedestal */}
                     <div className="absolute inset-2 overflow-hidden rounded-full">
-                      <img 
-                        src={card.image} 
+                      <img
+                        src={card.image}
                         alt={card.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Title */}
-                <h3 className="text-xs md:text-sm font-bold text-white mb-0.5">{card.title}</h3>
-                
+                <h3 className="text-xs md:text-sm font-bold text-black mb-0.5">{card.title}</h3>
+
                 {/* Description */}
-                <p className="text-[10px] md:text-xs text-gray-400 mb-2">{card.description}</p>
-                
+                <p className="text-[10px] md:text-xs text-gray-600 mb-2">{card.description}</p>
+
                 {/* Pricing */}
                 <div className="mb-2 md:mb-3">
                   <div className="flex items-baseline justify-center gap-1.5">
@@ -652,7 +705,7 @@ const Home = () => {
                     <span className="text-[10px] md:text-xs text-green-400 font-semibold">{card.discount}</span>
                   </div>
                 </div>
-                
+
                 {/* Build Your Box Button */}
                 <div className="w-full border-2 border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black px-3 py-1.5 md:py-2 rounded-md text-[10px] md:text-xs font-semibold transition-all duration-300 text-center">
                   Build Your Box
@@ -704,14 +757,14 @@ const Home = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-black text-white overflow-x-hidden md:overflow-x-visible pb-20 md:pb-0"
+      className="min-h-screen bg-white text-black overflow-x-hidden md:overflow-x-visible pb-20 md:pb-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       {/* Navigation Bar */}
       <motion.nav
-        className="w-full bg-black border-b border-gray-800"
+        className="w-full bg-white border-b border-gray-200"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -731,13 +784,13 @@ const Home = () => {
               </button>
 
               <div className="flex items-center gap-2 md:gap-3">
-              {logo && (
-                <img 
-                  src={logo} 
-                  alt="THE PERFUME Logo" 
-                  className="h-6 md:h-8 w-auto"
-                />
-              )}
+                {logo && (
+                  <img
+                    src={logo}
+                    alt="THE PERFUME Logo"
+                    className="h-6 md:h-8 w-auto"
+                  />
+                )}
                 <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
                   VINTAGE BEAUTY
                 </h1>
@@ -748,11 +801,10 @@ const Home = () => {
             <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
               <Link
                 to="/"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Home'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Home'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-600 hover:text-[#D4AF37]'
+                  }`}
               >
                 Home
                 {activeNavTab === 'Home' && (
@@ -761,11 +813,10 @@ const Home = () => {
               </Link>
               <Link
                 to="/products"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Shop All'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Shop All'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Shop All
                 {activeNavTab === 'Shop All' && (
@@ -774,11 +825,10 @@ const Home = () => {
               </Link>
               <Link
                 to="/deals"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Deals'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Deals'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Deals
                 {activeNavTab === 'Deals' && (
@@ -787,11 +837,10 @@ const Home = () => {
               </Link>
               <Link
                 to="/account"
-                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${
-                  activeNavTab === 'Account'
-                    ? 'text-[#D4AF37]'
-                    : 'text-gray-400 hover:text-[#D4AF37]'
-                }`}
+                className={`px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 relative ${activeNavTab === 'Account'
+                  ? 'text-[#D4AF37]'
+                  : 'text-gray-400 hover:text-[#D4AF37]'
+                  }`}
               >
                 Account
                 {activeNavTab === 'Account' && (
@@ -803,12 +852,12 @@ const Home = () => {
             {/* Shopping Bag Icon */}
             <motion.button
               onClick={() => navigate('/cart')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative lg:absolute lg:right-0"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative lg:absolute lg:right-0"
               aria-label="Shopping Cart"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               {cartCount > 0 && (
@@ -823,7 +872,7 @@ const Home = () => {
 
       {/* Category Images Carousel */}
       <motion.div
-        className="w-full bg-black py-4 md:py-6 overflow-hidden"
+        className="w-full bg-white py-4 md:py-6 overflow-hidden"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -856,7 +905,7 @@ const Home = () => {
                             }}
                           />
                         </div>
-                        <span className="text-xs text-white text-center font-medium">{category}</span>
+                        <span className="text-xs text-black text-center font-medium">{category}</span>
                       </Link>
                     );
                   })}
@@ -893,7 +942,7 @@ const Home = () => {
                       }}
                     />
                   </motion.div>
-                  <span className="text-sm lg:text-base text-white text-center font-medium group-hover:text-[#D4AF37] transition-colors">
+                  <span className="text-sm lg:text-base text-black text-center font-medium group-hover:text-[#D4AF37] transition-colors">
                     {category}
                   </span>
                 </Link>
@@ -905,7 +954,7 @@ const Home = () => {
 
       {/* Category Navigation */}
       <motion.div
-        className="w-full bg-black overflow-x-auto scrollbar-hide"
+        className="w-full bg-white overflow-x-auto scrollbar-hide"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
@@ -948,11 +997,10 @@ const Home = () => {
                     // Aggressive prefetch on hover - start immediately
                     prefetchCategoryProducts(category);
                   }}
-                  className={`text-sm md:text-base font-medium whitespace-nowrap transition-colors pb-2 border-b-2 ${
-                    activeCategory === category
-                      ? 'text-white border-[#D4AF37] font-semibold'
-                      : 'text-white border-transparent hover:text-[#D4AF37]'
-                  }`}
+                  className={`text-sm md:text-base font-medium whitespace-nowrap transition-colors pb-2 border-b-2 ${activeCategory === category
+                    ? 'text-black border-[#D4AF37] font-semibold'
+                    : 'text-black border-transparent hover:text-[#D4AF37]'
+                    }`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 * index }}
@@ -973,7 +1021,7 @@ const Home = () => {
       {/* Promotional Banner - Dynamic from API */}
       {!loadingAnnouncements && (
         <motion.div
-          className="w-full bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/20 to-[#D4AF37]/10 border-y border-[#D4AF37]/30 relative overflow-hidden"
+          className="w-full bg-[#D4AF37]/10 border-y-2 border-[#D4AF37] relative overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
@@ -982,12 +1030,12 @@ const Home = () => {
             <div className="flex items-center justify-between gap-3 md:gap-6 py-4 md:py-5">
               {/* Left Side - First Announcement or Fallback */}
               {promotionalAnnouncements.length > 0 ? (
-                <div 
+                <div
                   className={`flex items-center gap-2 md:gap-3 flex-1 ${promotionalAnnouncements[0].link?.url ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
                   onClick={async () => {
                     const announcement = promotionalAnnouncements[0];
                     const announcementId = announcement._id || announcement.id;
-                    
+
                     // Track click
                     if (announcementId) {
                       try {
@@ -996,7 +1044,7 @@ const Home = () => {
                         console.error(`Error tracking click for announcement ${announcementId}:`, error);
                       }
                     }
-                    
+
                     // Navigate to link if available
                     if (announcement.link?.url) {
                       if (announcement.link.url.startsWith('http://') || announcement.link.url.startsWith('https://')) {
@@ -1013,13 +1061,13 @@ const Home = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                    <span className="text-sm md:text-base font-semibold text-white">
+                    <span className="text-sm md:text-base font-semibold text-black">
                       {promotionalAnnouncements[0].title || promotionalAnnouncements[0].content?.split('•')[0]?.trim() || 'FREE SHIPPING'}
                     </span>
                     {promotionalAnnouncements[0].content && promotionalAnnouncements[0].content.includes('•') && (
                       <>
                         <span className="hidden md:block text-[#D4AF37]">•</span>
-                        <span className="text-xs md:text-sm text-gray-300">
+                        <span className="text-xs md:text-sm text-gray-800 font-medium">
                           {promotionalAnnouncements[0].content.split('•')[1]?.trim() || promotionalAnnouncements[0].content.split('•')[0]?.trim() || 'On orders above ₹999'}
                         </span>
                       </>
@@ -1027,13 +1075,13 @@ const Home = () => {
                     {!promotionalAnnouncements[0].content?.includes('•') && promotionalAnnouncements[0].content && (
                       <>
                         <span className="hidden md:block text-[#D4AF37]">•</span>
-                        <span className="text-xs md:text-sm text-gray-300">{promotionalAnnouncements[0].content}</span>
+                        <span className="text-xs md:text-sm text-gray-800 font-medium">{promotionalAnnouncements[0].content}</span>
                       </>
                     )}
                     {!promotionalAnnouncements[0].content && (
                       <>
                         <span className="hidden md:block text-[#D4AF37]">•</span>
-                        <span className="text-xs md:text-sm text-gray-300">On orders above ₹999</span>
+                        <span className="text-xs md:text-sm text-gray-800 font-medium">On orders above ₹999</span>
                       </>
                     )}
                   </div>
@@ -1047,9 +1095,9 @@ const Home = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                    <span className="text-sm md:text-base font-semibold text-white">FREE SHIPPING</span>
+                    <span className="text-sm md:text-base font-semibold text-black">FREE SHIPPING</span>
                     <span className="hidden md:block text-[#D4AF37]">•</span>
-                    <span className="text-xs md:text-sm text-gray-300">On orders above ₹999</span>
+                    <span className="text-xs md:text-sm text-gray-800 font-medium">On orders above ₹999</span>
                   </div>
                 </div>
               )}
@@ -1057,8 +1105,8 @@ const Home = () => {
               {/* Center - Model Image */}
               <div className="hidden md:flex items-center justify-center flex-shrink-0">
                 <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-[#D4AF37]/40 shadow-lg bg-gray-800">
-                  <img 
-                    src={heroimg} 
+                  <img
+                    src={heroimg}
                     alt="Vintage Beauty"
                     className="w-full h-full object-cover"
                   />
@@ -1067,12 +1115,12 @@ const Home = () => {
 
               {/* Right Side - Second Announcement or Fallback */}
               {promotionalAnnouncements.length > 1 ? (
-                <div 
+                <div
                   className={`flex items-center gap-2 md:gap-3 flex-1 justify-end ${promotionalAnnouncements[1].link?.url ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
                   onClick={async () => {
                     const announcement = promotionalAnnouncements[1];
                     const announcementId = announcement._id || announcement.id;
-                    
+
                     // Track click
                     if (announcementId) {
                       try {
@@ -1081,7 +1129,7 @@ const Home = () => {
                         console.error(`Error tracking click for announcement ${announcementId}:`, error);
                       }
                     }
-                    
+
                     // Navigate to link if available
                     if (announcement.link?.url) {
                       if (announcement.link.url.startsWith('http://') || announcement.link.url.startsWith('https://')) {
@@ -1093,13 +1141,13 @@ const Home = () => {
                   }}
                 >
                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-right">
-                    <span className="text-sm md:text-base font-semibold text-white">
+                    <span className="text-sm md:text-base font-semibold text-black">
                       {promotionalAnnouncements[1].title || promotionalAnnouncements[1].content?.split('•')[0]?.trim() || 'FLAT 5% OFF'}
                     </span>
                     {promotionalAnnouncements[1].content && promotionalAnnouncements[1].content.includes('•') && (
                       <>
                         <span className="hidden md:block text-[#D4AF37]">•</span>
-                        <span className="text-xs md:text-sm text-gray-300">
+                        <span className="text-xs md:text-sm text-gray-800 font-medium">
                           {promotionalAnnouncements[1].content.split('•')[1]?.trim() || promotionalAnnouncements[1].content.split('•')[0]?.trim() || 'On Prepaid Orders'}
                         </span>
                       </>
@@ -1107,13 +1155,13 @@ const Home = () => {
                     {!promotionalAnnouncements[1].content?.includes('•') && promotionalAnnouncements[1].content && (
                       <>
                         <span className="hidden md:block text-[#D4AF37]">•</span>
-                        <span className="text-xs md:text-sm text-gray-300">{promotionalAnnouncements[1].content}</span>
+                        <span className="text-xs md:text-sm text-gray-800 font-medium">{promotionalAnnouncements[1].content}</span>
                       </>
                     )}
                     {!promotionalAnnouncements[1].content && (
                       <>
                         <span className="hidden md:block text-[#D4AF37]">•</span>
-                        <span className="text-xs md:text-sm text-gray-300">On Prepaid Orders</span>
+                        <span className="text-xs md:text-sm text-gray-800 font-medium">On Prepaid Orders</span>
                       </>
                     )}
                   </div>
@@ -1127,9 +1175,9 @@ const Home = () => {
                 // If only one announcement, show it on right side too or show fallback
                 <div className="flex items-center gap-2 md:gap-3 flex-1 justify-end">
                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-right">
-                    <span className="text-sm md:text-base font-semibold text-white">FLAT 5% OFF</span>
+                    <span className="text-sm md:text-base font-semibold text-black">FLAT 5% OFF</span>
                     <span className="hidden md:block text-[#D4AF37]">•</span>
-                    <span className="text-xs md:text-sm text-gray-300">On Prepaid Orders</span>
+                    <span className="text-xs md:text-sm text-gray-800 font-medium">On Prepaid Orders</span>
                   </div>
                   <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
                     <svg className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1141,9 +1189,9 @@ const Home = () => {
                 // Fallback - Default FLAT 5% OFF
                 <div className="flex items-center gap-2 md:gap-3 flex-1 justify-end">
                   <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-right">
-                    <span className="text-sm md:text-base font-semibold text-white">FLAT 5% OFF</span>
+                    <span className="text-sm md:text-base font-semibold text-black">FLAT 5% OFF</span>
                     <span className="hidden md:block text-[#D4AF37]">•</span>
-                    <span className="text-xs md:text-sm text-gray-300">On Prepaid Orders</span>
+                    <span className="text-xs md:text-sm text-gray-800 font-medium">On Prepaid Orders</span>
                   </div>
                   <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
                     <svg className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1166,7 +1214,7 @@ const Home = () => {
 
       {/* Hero Section - Cosmetic Body Spray */}
       <motion.section
-        className="w-full bg-black py-6 md:py-10 lg:py-12 min-h-[250px] md:min-h-[350px] lg:min-h-[450px] flex items-center relative overflow-hidden"
+        className="w-full bg-white py-6 md:py-10 lg:py-12 min-h-[250px] md:min-h-[350px] lg:min-h-[450px] flex items-center relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.4 }}
@@ -1186,13 +1234,13 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                <span className="text-white">Cosmetic </span>
+                <span className="text-black">Body </span>
                 <span className="text-[#D4AF37]">
-                  <span className="font-bold">Body</span> Spray
+                  <span className="font-bold">Perfume</span> Spray
                 </span>
               </motion.h2>
               <motion.p
-                className="text-sm md:text-base lg:text-lg text-white mb-4 md:mb-5 lg:mb-6 max-w-xl md:max-w-2xl"
+                className="text-sm md:text-base lg:text-lg text-black mb-4 md:mb-5 lg:mb-6 max-w-xl md:max-w-2xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.7 }}
@@ -1223,23 +1271,15 @@ const Home = () => {
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <div className="relative h-full flex items-center">
-                <motion.img
-                  src={heroimg}
-                  alt="Cosmetic Body Spray"
-                  className="absolute -right-26 max-w-2xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl h-[300px] md:h-[450px] lg:h-[550px] object-contain drop-shadow-2xl z-0"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
-                  whileHover={{ scale: 1.05 }}
-                />
+                <PerfumeImageSlideshow />
               </div>
             </motion.div>
-            </div>
           </div>
+        </div>
       </motion.section>
 
       {/* Banner Carousel - Direct, with subtle spacing from hero image */}
-      <div className="w-full bg-black pt-2 md:pt-3 pb-4 md:pb-6 mt-4 md:mt-6">
+      <div className="w-full bg-white pt-2 md:pt-3 pb-4 md:pb-6 mt-4 md:mt-6">
         <div className="container mx-auto px-4 md:px-6">
           <BannerCarousel />
         </div>
@@ -1247,7 +1287,7 @@ const Home = () => {
 
       {/* Deal Cards Section */}
       <motion.section
-        className="w-full bg-black py-8 md:py-12"
+        className="w-full bg-white py-8 md:py-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.7 }}
@@ -1260,7 +1300,7 @@ const Home = () => {
       {/* Dynamic Products Section */}
       <motion.section
         id="products-section"
-        className="w-full bg-black py-6 md:py-12"
+        className="w-full bg-white py-6 md:py-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}
@@ -1268,7 +1308,7 @@ const Home = () => {
         <div className="container mx-auto px-4 md:px-6">
           {/* Section Header */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-white">
+            <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-black">
               {activeCategory === 'Perfume' ? 'Dynamic Perfume' : activeCategory}
             </h3>
             <button className="text-[#D4AF37] hover:text-[#F4D03F] transition-colors">
@@ -1320,7 +1360,7 @@ const Home = () => {
                   const productImage = product.image || heroimg;
                   const stockValue = Number(product?.stock);
                   const isOutOfStock = product?.inStock === false || (Number.isFinite(stockValue) && stockValue <= 0);
-                  
+
                   return (
                     <motion.div
                       key={productId}
@@ -1399,16 +1439,15 @@ const Home = () => {
                                   },
                                 });
                               } catch (error) {
-                            const message = error?.message || 'Failed to add to cart';
-                            toast.error(message);
+                                const message = error?.message || 'Failed to add to cart';
+                                toast.error(message);
                               }
                             }}
                             disabled={isOutOfStock}
-                            className={`w-full mt-2 font-bold px-2 py-1.5 rounded-lg text-[10px] md:text-xs transition-all duration-300 shadow-md ${
-                              isOutOfStock
-                                ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
-                                : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black hover:shadow-lg'
-                            }`}
+                            className={`w-full mt-2 font-bold px-2 py-1.5 rounded-lg text-[10px] md:text-xs transition-all duration-300 shadow-md ${isOutOfStock
+                              ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
+                              : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black hover:shadow-lg'
+                              }`}
                           >
                             {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                           </button>
@@ -1423,51 +1462,51 @@ const Home = () => {
                 </div>
               )}
             </motion.div>
-            </div>
           </div>
+        </div>
       </motion.section>
 
       {/* Sidebar Menu - Sliding from left */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-black z-[9999] shadow-2xl transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col border-r border-gray-800`}>
+      <div className={`fixed left-0 top-0 h-full w-80 bg-white z-[9999] shadow-2xl transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col border-r border-gray-200`}>
         <div className="overflow-y-auto flex-1 sidebar-scroll scroll-smooth">
           {/* Close Button */}
           <div className="flex justify-end p-4 border-b border-gray-800">
-              <button
-                onClick={() => setIsMenuOpen(false)}
-              className="text-white hover:text-[#D4AF37] transition-colors p-2"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className="text-black hover:text-[#D4AF37] transition-colors p-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
           {/* Top Section - MY ORDERS & TRACK ORDER Buttons */}
           <div className="px-4 pt-4 pb-4">
             <div className="flex gap-2 mb-4">
-              <button 
+              <button
                 onClick={() => {
                   navigate('/orders');
                   setIsMenuOpen(false);
                 }}
-                className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition cursor-pointer"
+                className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition cursor-pointer"
               >
                 <svg className="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                <span className="text-sm font-bold text-white">MY ORDERS</span>
+                <span className="text-sm font-bold text-black">MY ORDERS</span>
               </button>
-              <button 
+              <button
                 onClick={() => {
                   navigate('/track-order');
                   setIsMenuOpen(false);
                 }}
-                className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition cursor-pointer"
+                className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition cursor-pointer"
               >
                 <svg className="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
-                <span className="text-sm font-bold text-white">TRACK ORDER</span>
+                <span className="text-sm font-bold text-black">TRACK ORDER</span>
               </button>
             </div>
 
@@ -1524,14 +1563,14 @@ const Home = () => {
                 return (
                   <button
                     key={category._id || category.id || index}
-                onClick={() => {
-                  // Use same navigation logic as home page category icons
-                  sessionStorage.setItem('selectedCategory', category.name);
-                  sessionStorage.setItem('autoScrollToProducts', 'true');
-                  setIsMenuOpen(false);
-                  navigate(`/products?category=${category.name.toLowerCase().replace(' ', '-')}`);
-                  trackCategoryVisit(category.name);
-                }}
+                    onClick={() => {
+                      // Use same navigation logic as home page category icons
+                      sessionStorage.setItem('selectedCategory', category.name);
+                      sessionStorage.setItem('autoScrollToProducts', 'true');
+                      setIsMenuOpen(false);
+                      navigate(`/products?category=${category.name.toLowerCase().replace(' ', '-')}`);
+                      trackCategoryVisit(category.name);
+                    }}
                     className="flex flex-col items-center"
                   >
                     <div className={`w-16 h-16 rounded-full ${backgrounds[index % backgrounds.length]} flex items-center justify-center overflow-hidden shadow-md ${index === 0 ? 'border-2 border-[#D4AF37]' : ''}`}>
@@ -1546,9 +1585,9 @@ const Home = () => {
           </div>
 
           {/* Main Menu List */}
-          <div className="bg-black pb-4">
+          <div className="bg-white pb-4">
             {/* SHOP ALL */}
-            <Link 
+            <Link
               to="/products"
               onClick={() => {
                 // Clear any category selection for "Shop All"
@@ -1556,12 +1595,12 @@ const Home = () => {
                 sessionStorage.removeItem('autoScrollToProducts');
                 setIsMenuOpen(false);
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition"
             >
               <svg className="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              <span className="flex-1 text-left text-sm font-semibold text-white">SHOP ALL</span>
+              <span className="flex-1 text-left text-sm font-semibold text-black">SHOP ALL</span>
             </Link>
 
 
@@ -1621,11 +1660,11 @@ const Home = () => {
                     navigate(`/products?category=${category.name.toLowerCase().replace(' ', '-')}`);
                     trackCategoryVisit(category.name);
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900 transition"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition"
                 >
                   {getCategoryIcon(category.name)}
-                  <span className="flex-1 text-left text-sm font-semibold text-white">{category.name}</span>
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="flex-1 text-left text-sm font-semibold text-black">{category.name}</span>
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -1634,8 +1673,8 @@ const Home = () => {
           </div>
           {/* Bottom padding for better scrolling */}
           <div className="pb-8"></div>
-          </div>
         </div>
+      </div>
 
       {/* Overlay - Only on mobile */}
       {isMenuOpen && (

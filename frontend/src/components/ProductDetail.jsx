@@ -230,7 +230,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-white text-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#D4AF37]"></div>
       </div>
     );
@@ -238,7 +238,7 @@ const ProductDetail = () => {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-white text-black flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl mb-4">{error || 'Product not found'}</h2>
           <Link to="/products" className="text-[#D4AF37] hover:underline">
@@ -373,7 +373,7 @@ const ProductDetail = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-black text-white overflow-x-hidden pb-24 md:pb-0"
+      className="min-h-screen bg-white text-black overflow-x-hidden pb-24 md:pb-0"
       initial="initial"
       animate="animate"
       exit="exit"
@@ -381,7 +381,7 @@ const ProductDetail = () => {
     >
       {/* Navigation Bar */}
       <motion.nav
-        className="w-full bg-black border-b border-gray-800 sticky top-0 z-50"
+        className="w-full bg-white border-b border-gray-200 sticky top-0 z-50"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -393,10 +393,10 @@ const ProductDetail = () => {
               {/* Back Button - Mobile Only */}
               <button
                 onClick={() => navigate(-1)}
-                className="md:hidden p-2 hover:bg-gray-900 rounded-lg transition-colors"
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label="Back"
               >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -409,7 +409,7 @@ const ProductDetail = () => {
                   className="h-6 md:h-8 w-auto"
                 />
               )}
-              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-white">
+              <h1 className="text-base md:text-xl lg:text-2xl font-semibold uppercase tracking-wider text-black">
                 VINTAGE BEAUTY
               </h1>
             </div>
@@ -469,10 +469,10 @@ const ProductDetail = () => {
             {/* Shopping Bag Icon */}
             <button
               onClick={() => navigate('/cart')}
-              className="p-2 hover:bg-gray-900 rounded-lg transition-colors relative"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
               aria-label="Shopping Cart"
             >
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               {cartCount > 0 && (
@@ -487,7 +487,7 @@ const ProductDetail = () => {
 
       {/* Product Image Section */}
       <motion.div
-        className="w-full bg-black"
+        className="w-full bg-white"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -497,7 +497,7 @@ const ProductDetail = () => {
             {productImages.length > 1 && (
               <button
                 onClick={() => setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1))}
-                className="absolute left-4 z-10 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors"
+                className="absolute left-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full text-black border border-gray-200 transition-colors shadow-lg"
                 aria-label="Previous image"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,7 +522,7 @@ const ProductDetail = () => {
             {productImages.length > 1 && (
               <button
                 onClick={() => setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1))}
-                className="absolute right-4 z-10 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors"
+                className="absolute right-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full text-black border border-gray-200 transition-colors shadow-lg"
                 aria-label="Next image"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -561,7 +561,7 @@ const ProductDetail = () => {
 
       {/* Product Details Card */}
       <motion.div
-        className="bg-[#3A2E1F] md:bg-[#4A3A2A] rounded-t-3xl md:rounded-t-[40px] -mt-8 md:-mt-12 relative z-10"
+        className="bg-white md:bg-gray-50 rounded-t-3xl md:rounded-t-[40px] -mt-8 md:-mt-12 relative z-10 border-t border-gray-200"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
@@ -569,27 +569,27 @@ const ProductDetail = () => {
         <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
           {/* 4 Specification Boxes */}
           <div className="grid grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-6">
-            <div className="bg-black bg-opacity-30 rounded-lg p-2 md:p-3 text-center">
-              <p className="text-xs md:text-xs text-gray-300 mb-1">{product.isGiftSet ? 'Type' : 'Size'}</p>
-              <p className="text-sm md:text-sm font-bold text-white">{product.isGiftSet ? 'Gift Set' : size}</p>
+            <div className="bg-gray-100 rounded-lg p-2 md:p-3 text-center border border-gray-200">
+              <p className="text-xs md:text-xs text-gray-600 mb-1">{product.isGiftSet ? 'Type' : 'Size'}</p>
+              <p className="text-sm md:text-sm font-bold text-black">{product.isGiftSet ? 'Gift Set' : size}</p>
             </div>
-            <div className="bg-black bg-opacity-30 rounded-lg p-2 md:p-3 text-center">
-              <p className="text-[10px] md:text-xs text-gray-300 mb-1">Purity</p>
-              <p className="text-xs md:text-sm font-bold text-white">100% Pure</p>
+            <div className="bg-gray-100 rounded-lg p-2 md:p-3 text-center border border-gray-200">
+              <p className="text-[10px] md:text-xs text-gray-600 mb-1">Purity</p>
+              <p className="text-xs md:text-sm font-bold text-black">100% Pure</p>
             </div>
-            <div className="bg-black bg-opacity-30 rounded-lg p-2 md:p-3 text-center">
-              <p className="text-[10px] md:text-xs text-gray-300 mb-1">Rating</p>
-              <p className="text-xs md:text-sm font-bold text-white">{rating} ⭐</p>
+            <div className="bg-gray-100 rounded-lg p-2 md:p-3 text-center border border-gray-200">
+              <p className="text-[10px] md:text-xs text-gray-600 mb-1">Rating</p>
+              <p className="text-xs md:text-sm font-bold text-black">{rating} ⭐</p>
             </div>
-            <div className="bg-black bg-opacity-30 rounded-lg p-2 md:p-3 text-center">
-              <p className="text-[10px] md:text-xs text-gray-300 mb-1">Brand</p>
-              <p className="text-xs md:text-sm font-bold text-white truncate">{brandName}</p>
+            <div className="bg-gray-100 rounded-lg p-2 md:p-3 text-center border border-gray-200">
+              <p className="text-[10px] md:text-xs text-gray-600 mb-1">Brand</p>
+              <p className="text-xs md:text-sm font-bold text-black truncate">{brandName}</p>
             </div>
           </div>
 
           {/* Product Name and Price */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white flex-1">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-black flex-1">
               {product.name}
             </h2>
             <p className="text-lg md:text-xl lg:text-2xl font-bold text-[#D4AF37] ml-4">
@@ -600,7 +600,7 @@ const ProductDetail = () => {
           {/* Size Selector - Hidden for Gift Sets */}
           {product.sizes && product.sizes.length > 0 && !product.isGiftSet && (
             <div className="mb-6">
-              <p className="text-sm text-gray-300 mb-3">Select Size</p>
+              <p className="text-sm text-gray-600 mb-3">Select Size</p>
               <div className="flex flex-wrap gap-3">
                 {product.sizes.map((s, idx) => (
                   <button
@@ -608,7 +608,7 @@ const ProductDetail = () => {
                     onClick={() => setSelectedSize(s.size)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border ${selectedSize === s.size
                       ? 'bg-[#D4AF37] text-black border-[#D4AF37]'
-                      : 'bg-transparent text-white border-gray-600 hover:border-[#D4AF37] hover:text-[#D4AF37]'
+                      : 'bg-white text-black border-gray-300 hover:border-[#D4AF37] hover:text-[#D4AF37]'
                       }`}
                   >
                     {s.size}
@@ -620,7 +620,7 @@ const ProductDetail = () => {
 
           {/* Product Description */}
           <div className="mb-6 md:mb-8">
-            <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+            <p className="text-sm md:text-base text-gray-700 leading-relaxed">
               {product.description || product.scentProfile || 'Premium fragrance from Vintage Beauty. Experience luxury and elegance with this exquisite scent.'}
             </p>
           </div>
@@ -628,17 +628,17 @@ const ProductDetail = () => {
           {/* Gift Set Contents Section */}
           {product.isGiftSet && product.giftSetItems && product.giftSetItems.length > 0 && (
             <div className="mb-6 md:mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3">What's Inside This Gift Set</h3>
-              <div className="bg-black bg-opacity-20 rounded-lg p-4">
+              <h3 className="text-lg md:text-xl font-bold text-black mb-3">What's Inside This Gift Set</h3>
+              <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
                 {loadingGiftSetDetails ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#D4AF37]"></div>
-                    <span className="ml-3 text-gray-300">Loading gift set products...</span>
+                    <span className="ml-3 text-gray-600">Loading gift set products...</span>
                   </div>
                 ) : giftSetProductDetails.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {giftSetProductDetails.map((productDetail, index) => (
-                      <div key={productDetail._id || index} className="bg-gray-800 bg-opacity-50 rounded-lg p-3 border border-gray-700 text-center hover:bg-opacity-70 transition-all duration-200">
+                      <div key={productDetail._id || index} className="bg-white rounded-lg p-3 border border-gray-200 text-center hover:border-[#D4AF37] transition-all duration-200 shadow-sm">
                         {/* Product Image */}
                         <div className="relative mb-2">
                           <img
@@ -656,7 +656,7 @@ const ProductDetail = () => {
                         </div>
 
                         {/* Product Name */}
-                        <h4 className="text-sm font-semibold text-white mb-1 line-clamp-2">
+                        <h4 className="text-sm font-semibold text-black mb-1 line-clamp-2">
                           {productDetail.name || `Product ${index + 1}`}
                         </h4>
 
@@ -671,8 +671,8 @@ const ProductDetail = () => {
                   </div>
                 ) : product.giftSetItems.length > 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-gray-400 mb-2">🎁</div>
-                    <p className="text-gray-300">
+                    <div className="text-gray-500 mb-2">🎁</div>
+                    <p className="text-gray-600">
                       This gift set contains {product.giftSetItems.length} premium fragrance product{product.giftSetItems.length > 1 ? 's' : ''}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
@@ -683,22 +683,22 @@ const ProductDetail = () => {
 
                 {/* Gift Set Summary */}
                 {giftSetProductDetails.length > 0 && (
-                  <div className="mt-6 pt-4 border-t border-gray-700">
+                  <div className="mt-6 pt-4 border-t border-gray-200">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-300">Total Products in Set:</span>
-                      <span className="text-white font-bold">{giftSetProductDetails.length} Premium Items</span>
+                      <span className="text-gray-600">Total Products in Set:</span>
+                      <span className="text-black font-bold">{giftSetProductDetails.length} Premium Items</span>
                     </div>
                     {product.giftSetDiscount > 0 && (
                       <>
                         <div className="flex items-center justify-between text-sm mt-2">
-                          <span className="text-gray-300">Total Value:</span>
-                          <span className="text-gray-400 line-through">
+                          <span className="text-gray-600">Total Value:</span>
+                          <span className="text-gray-500 line-through">
                             ₹{giftSetProductDetails.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm mt-1">
-                          <span className="text-green-400">You Save:</span>
-                          <span className="text-green-400 font-bold">
+                          <span className="text-green-600">You Save:</span>
+                          <span className="text-green-600 font-bold">
                             ₹{(giftSetProductDetails.reduce((total, item) => total + (item.price * item.quantity), 0) - product.price).toFixed(2)} {product.giftSetManualPrice ? '(Custom Pricing)' : `(${product.giftSetDiscount}%)`}
                           </span>
                         </div>
@@ -713,9 +713,9 @@ const ProductDetail = () => {
           {/* Material/Fragrance Type Section */}
           {product.material && (
             <div className="mb-6 md:mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Material/Fragrance Type</h3>
-              <div className="bg-black bg-opacity-20 rounded-lg p-4">
-                <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+              <h3 className="text-lg md:text-xl font-bold text-black mb-3">Material/Fragrance Type</h3>
+              <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
+                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
                   {product.material}
                 </p>
               </div>
@@ -725,9 +725,9 @@ const ProductDetail = () => {
           {/* Colour/Fragrance Notes Section */}
           {product.colour && (
             <div className="mb-6 md:mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Colour/Fragrance Notes</h3>
-              <div className="bg-black bg-opacity-20 rounded-lg p-4">
-                <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+              <h3 className="text-lg md:text-xl font-bold text-black mb-3">Colour/Fragrance Notes</h3>
+              <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
+                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
                   {product.colour}
                 </p>
               </div>
@@ -737,9 +737,9 @@ const ProductDetail = () => {
           {/* Fragrance Notes/Utility Section */}
           {product.utility && (
             <div className="mb-6 md:mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Fragrance Notes/Utility</h3>
-              <div className="bg-black bg-opacity-20 rounded-lg p-4">
-                <p className="text-sm md:text-base text-gray-300 leading-relaxed whitespace-pre-line">
+              <h3 className="text-lg md:text-xl font-bold text-black mb-3">Fragrance Notes/Utility</h3>
+              <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
+                <p className="text-sm md:text-base text-gray-700 leading-relaxed whitespace-pre-line">
                   {product.utility}
                 </p>
               </div>
@@ -749,9 +749,9 @@ const ProductDetail = () => {
           {/* Care Instructions Section */}
           {product.care && (
             <div className="mb-6 md:mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-3">Care Instructions</h3>
-              <div className="bg-black bg-opacity-20 rounded-lg p-4">
-                <p className="text-sm md:text-base text-gray-300 leading-relaxed whitespace-pre-line">
+              <h3 className="text-lg md:text-xl font-bold text-black mb-3">Care Instructions</h3>
+              <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
+                <p className="text-sm md:text-base text-gray-700 leading-relaxed whitespace-pre-line">
                   {product.care}
                 </p>
               </div>
@@ -761,7 +761,7 @@ const ProductDetail = () => {
           {/* Reviews Section */}
           <div className="mb-6 md:mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg md:text-xl font-bold text-white">Reviews & Ratings</h3>
+              <h3 className="text-lg md:text-xl font-bold text-black">Reviews & Ratings</h3>
               {localStorage.getItem('token') && (
                 <button
                   onClick={() => setShowReviewForm(!showReviewForm)}
@@ -773,7 +773,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Overall Rating Display */}
-            <div className="bg-black bg-opacity-20 rounded-lg p-4 mb-4">
+            <div className="bg-gray-100 rounded-lg p-4 mb-4 border border-gray-200">
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => {
@@ -783,7 +783,7 @@ const ProductDetail = () => {
                     return (
                       <svg
                         key={i}
-                        className={`w-5 h-5 ${isFull ? 'text-[#D4AF37]' : isHalf ? 'text-[#D4AF37]' : 'text-gray-600'}`}
+                        className={`w-5 h-5 ${isFull ? 'text-[#D4AF37]' : isHalf ? 'text-[#D4AF37]' : 'text-gray-300'}`}
                         fill={isFull || isHalf ? 'currentColor' : 'none'}
                         stroke={isHalf ? 'currentColor' : 'none'}
                         viewBox="0 0 20 20"
@@ -793,23 +793,23 @@ const ProductDetail = () => {
                     );
                   })}
                 </div>
-                <span className="text-sm text-gray-300">({rating > 0 ? rating.toFixed(1) : '0.0'} out of 5)</span>
+                <span className="text-sm text-gray-600">({rating > 0 ? rating.toFixed(1) : '0.0'} out of 5)</span>
                 {(product.reviews || 0) > 0 && (
-                  <span className="text-sm text-gray-400">• {product.reviews || 0} {(product.reviews || 0) === 1 ? 'review' : 'reviews'}</span>
+                  <span className="text-sm text-gray-500">• {product.reviews || 0} {(product.reviews || 0) === 1 ? 'review' : 'reviews'}</span>
                 )}
               </div>
-              <p className="text-sm text-gray-400">Based on customer reviews</p>
+              <p className="text-sm text-gray-500">Based on customer reviews</p>
             </div>
 
             {/* Review Form */}
             {showReviewForm && (
-              <div className="bg-black bg-opacity-20 rounded-lg p-4 mb-4">
-                <h4 className="text-base font-semibold text-white mb-3">
+              <div className="bg-gray-100 rounded-lg p-4 mb-4 border border-gray-200">
+                <h4 className="text-base font-semibold text-black mb-3">
                   {userReview ? 'Edit Your Review' : 'Write a Review'}
                 </h4>
 
                 <div className="mb-4">
-                  <label className="block text-sm text-gray-300 mb-2">Rating *</label>
+                  <label className="block text-sm text-gray-700 mb-2">Rating *</label>
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -819,7 +819,7 @@ const ProductDetail = () => {
                         className="focus:outline-none transition-transform hover:scale-110"
                       >
                         <svg
-                          className={`w-8 h-8 ${star <= reviewRating ? 'text-[#D4AF37]' : 'text-gray-600'}`}
+                          className={`w-8 h-8 ${star <= reviewRating ? 'text-[#D4AF37]' : 'text-gray-300'}`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -831,23 +831,23 @@ const ProductDetail = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm text-gray-300 mb-2">Your Review (Optional)</label>
+                  <label className="block text-sm text-gray-700 mb-2">Your Review (Optional)</label>
                   <textarea
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     placeholder="Share your experience with this product..."
-                    className="w-full bg-gray-900 text-white rounded-lg p-3 border border-gray-700 focus:border-[#D4AF37] focus:outline-none resize-none"
+                    className="w-full bg-white text-black rounded-lg p-3 border border-gray-300 focus:border-[#D4AF37] focus:outline-none resize-none"
                     rows={4}
                     maxLength={1000}
                   />
-                  <p className="text-xs text-gray-400 mt-1">{reviewComment.length}/1000 characters</p>
+                  <p className="text-xs text-gray-500 mt-1">{reviewComment.length}/1000 characters</p>
                 </div>
 
                 <div className="flex gap-2">
                   <button
                     onClick={handleSubmitReview}
                     disabled={submittingReview || reviewRating === 0}
-                    className="bg-[#D4AF37] hover:bg-[#F4D03F] disabled:bg-gray-700 disabled:cursor-not-allowed text-black font-bold px-6 py-2 rounded-lg transition-all duration-300"
+                    className="bg-[#D4AF37] hover:bg-[#F4D03F] disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-bold px-6 py-2 rounded-lg transition-all duration-300"
                   >
                     {submittingReview ? 'Submitting...' : userReview ? 'Update Review' : 'Submit Review'}
                   </button>
@@ -859,7 +859,7 @@ const ProductDetail = () => {
                         setReviewComment('');
                       }
                     }}
-                    className="bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+                    className="bg-gray-200 hover:bg-gray-300 text-black font-semibold px-6 py-2 rounded-lg transition-all duration-300"
                   >
                     Cancel
                   </button>
@@ -875,14 +875,14 @@ const ProductDetail = () => {
             ) : reviews.length > 0 ? (
               <div className="space-y-4">
                 {reviews.map((review) => (
-                  <div key={review._id} className="bg-black bg-opacity-20 rounded-lg p-4">
+                  <div key={review._id} className="bg-gray-100 rounded-lg p-4 border border-gray-200">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg
                               key={star}
-                              className={`w-4 h-4 ${star <= review.rating ? 'text-[#D4AF37]' : 'text-gray-600'}`}
+                              className={`w-4 h-4 ${star <= review.rating ? 'text-[#D4AF37]' : 'text-gray-300'}`}
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -890,19 +890,19 @@ const ProductDetail = () => {
                             </svg>
                           ))}
                         </div>
-                        <span className="text-sm font-semibold text-white">{review.userName || review.user?.name || 'Anonymous'}</span>
+                        <span className="text-sm font-semibold text-black">{review.userName || review.user?.name || 'Anonymous'}</span>
                       </div>
-                      <span className="text-xs text-gray-400">{formatDate(review.createdAt)}</span>
+                      <span className="text-xs text-gray-500">{formatDate(review.createdAt)}</span>
                     </div>
                     {review.comment && (
-                      <p className="text-sm text-gray-300 mt-2">{review.comment}</p>
+                      <p className="text-sm text-gray-700 mt-2">{review.comment}</p>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="bg-black bg-opacity-20 rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-400">No reviews yet. Be the first to review this product!</p>
+              <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-200">
+                <p className="text-sm text-gray-500">No reviews yet. Be the first to review this product!</p>
               </div>
             )}
           </div>
@@ -910,7 +910,7 @@ const ProductDetail = () => {
           {/* Recommended Products */}
           {relatedProducts.length > 0 && (
             <div className="mb-24 md:mb-8">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-4">Recommended Products</h3>
+              <h3 className="text-lg md:text-xl font-bold text-black mb-4">Recommended Products</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 {relatedProducts.map((relatedProduct) => {
                   const relatedId = relatedProduct._id || relatedProduct.id;
@@ -926,9 +926,9 @@ const ProductDetail = () => {
                     <Link
                       key={relatedId}
                       to={`/product/${relatedId}`}
-                      className="bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer block"
+                      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer block border border-gray-200 hover:border-[#D4AF37]"
                     >
-                      <div className="relative h-32 md:h-40 bg-gray-800 overflow-hidden">
+                      <div className="relative h-32 md:h-40 bg-gray-100 overflow-hidden">
                         <img
                           src={relatedProduct.image || heroimg}
                           alt={relatedProduct.name}
@@ -940,7 +940,7 @@ const ProductDetail = () => {
                       </div>
                       <div className="p-2 md:p-3">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-xs md:text-sm font-semibold text-white flex-1 truncate hover:text-[#D4AF37] transition-colors">
+                          <h4 className="text-xs md:text-sm font-semibold text-black flex-1 truncate hover:text-[#D4AF37] transition-colors">
                             {relatedProduct.name}
                           </h4>
                           <p className="text-xs font-bold text-[#D4AF37] whitespace-nowrap">
@@ -958,22 +958,22 @@ const ProductDetail = () => {
       </motion.div>
 
       {/* Fixed Bottom Bar - Quantity and Add to Cart */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#3A2E1F] md:bg-[#4A3A2A] border-t border-gray-700 p-4 md:hidden z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden z-50 shadow-lg">
         <div className="container mx-auto flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-black bg-opacity-30 rounded-lg px-3 py-2">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 border border-gray-200">
             <button
               onClick={() => handleQuantityChange(-1)}
-              className="text-white hover:text-[#D4AF37] transition-colors"
+              className="text-black hover:text-[#D4AF37] transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
               </svg>
             </button>
-            <span className="text-white font-bold px-3 min-w-[30px] text-center">{quantity}</span>
+            <span className="text-black font-bold px-3 min-w-[30px] text-center">{quantity}</span>
             <button
               onClick={() => handleQuantityChange(1)}
               disabled={isOutOfStock || (Number.isFinite(stockValue) && quantity >= stockValue)}
-              className="text-white hover:text-[#D4AF37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-black hover:text-[#D4AF37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -985,7 +985,7 @@ const ProductDetail = () => {
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             className={`flex-1 font-bold px-4 py-3 rounded-lg text-sm transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${isOutOfStock
-              ? 'bg-gray-600 text-gray-200 cursor-not-allowed'
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black'
               }`}
           >
@@ -1001,22 +1001,22 @@ const ProductDetail = () => {
       </div>
 
       {/* Desktop Add to Cart Section */}
-      <div className="hidden md:block bg-[#3A2E1F] md:bg-[#4A3A2A] border-t border-gray-700 p-6 sticky bottom-0 z-40">
+      <div className="hidden md:block bg-white border-t border-gray-200 p-6 sticky bottom-0 z-40 shadow-lg">
         <div className="container mx-auto flex items-center justify-center gap-4">
-          <div className="flex items-center gap-2 bg-black bg-opacity-30 rounded-lg px-4 py-3">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-4 py-3 border border-gray-200">
             <button
               onClick={() => handleQuantityChange(-1)}
-              className="text-white hover:text-[#D4AF37] transition-colors"
+              className="text-black hover:text-[#D4AF37] transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
               </svg>
             </button>
-            <span className="text-white font-bold px-4 min-w-[40px] text-center text-lg">{quantity}</span>
+            <span className="text-black font-bold px-4 min-w-[40px] text-center text-lg">{quantity}</span>
             <button
               onClick={() => handleQuantityChange(1)}
               disabled={isOutOfStock || (Number.isFinite(stockValue) && quantity >= stockValue)}
-              className="text-white hover:text-[#D4AF37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-black hover:text-[#D4AF37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1028,7 +1028,7 @@ const ProductDetail = () => {
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             className={`font-bold px-8 py-3 rounded-lg text-base transition-all duration-300 shadow-lg flex items-center justify-center gap-3 min-w-[200px] ${isOutOfStock
-              ? 'bg-gray-600 text-gray-200 cursor-not-allowed'
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-[#D4AF37] hover:bg-[#F4D03F] text-black'
               }`}
           >
