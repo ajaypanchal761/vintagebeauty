@@ -757,7 +757,7 @@ const Home = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-white text-black overflow-x-hidden md:overflow-x-visible pb-20 md:pb-0"
+      className="min-h-screen bg-white text-black overflow-x-hidden md:overflow-x-visible pb-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -1236,7 +1236,7 @@ const Home = () => {
               >
                 <span className="text-black">Body </span>
                 <span className="text-[#D4AF37]">
-                  <span className="font-bold">Perfume</span> Spray
+                  <span className="font-bold">Perfume</span>
                 </span>
               </motion.h2>
               <motion.p
@@ -1245,7 +1245,7 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.7 }}
               >
-                Energetic aromatic Fougere fragrance for all the ways you play.
+                vintage perfume collaction
               </motion.p>
               <motion.button
                 onClick={() => navigate('/products')}
