@@ -258,7 +258,11 @@ const ProductDetail = () => {
     (product.sizes?.[2] || product.sizes?.[0]);
 
   let price = '';
-  if (currentSizeObj?.price) {
+  if (product.isGiftSet) {
+    // For gift sets, use manual price if set, otherwise use calculated price
+    const giftSetPrice = product.giftSetManualPrice || product.price || product.giftSetDiscountedPrice || 699;
+    price = `₹${giftSetPrice}`;
+  } else if (currentSizeObj?.price) {
     price = `₹${currentSizeObj.price}`;
   } else if (product.price) {
     price = `₹${product.price}`;
@@ -919,7 +923,7 @@ const ProductDetail = () => {
                     : (relatedProduct.price
                       ? `₹${relatedProduct.price}`
                       : (relatedProduct.sizes && relatedProduct.sizes.length > 0
-                        ? `₹${relatedProduct.sizes[2]?.price || relatedProduct.sizes[0]?.price}`
+                        ? `₹${relatedProduct.sizes[2]?.price || relatedProduct.sizes[0]?.price || relatedProduct.price}`
                         : '₹699'));
 
                   return (
