@@ -565,7 +565,7 @@ const ProductDetail = () => {
 
       {/* Product Details Card */}
       <motion.div
-        className="bg-white md:bg-gray-50 rounded-t-3xl md:rounded-t-[40px] -mt-8 md:-mt-12 relative z-10 border-t border-gray-200"
+        className="bg-white md:bg-gray-50 rounded-t-3xl md:rounded-t-[40px] md:-mt-12 relative z-10 border-t border-gray-200"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
