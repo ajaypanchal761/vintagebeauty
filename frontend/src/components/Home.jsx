@@ -44,7 +44,7 @@ const PerfumeImageSlideshow = () => {
     if (images.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % images.length);
-    }, 2000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [images]);
 
@@ -59,7 +59,7 @@ const PerfumeImageSlideshow = () => {
         className="w-full h-full object-cover"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.8 }}
         onError={(e) => {
           if (e.target.src !== heroimg) e.target.src = heroimg;
         }}
