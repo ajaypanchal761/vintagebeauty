@@ -127,7 +127,7 @@ const Footer = () => {
                   <p>Janakpurdham-7, Janakinagar, Dhanusha, Nepal</p>
                   <p>Telephone number: <span className="text-[#D4AF37]">041591376</span></p>
                   <p>Mobile number: <span className="text-[#D4AF37]">9854050076</span></p>
-                  <p>Mail id: <a href="mailto:info@jpmarketinggroups.co.in" className="text-[#D4AF37] hover:underline">info@jpmarketinggroups.co.in</a></p>
+                  
                 </div>
               </div>
             </div>
