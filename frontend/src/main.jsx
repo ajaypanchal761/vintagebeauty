@@ -81,6 +81,15 @@ if (typeof window !== 'undefined') {
   // Inject preload links immediately
   injectPreloadLinks();
 
+  // Dynamically set favicon to ensure it loads
+  const setFavicon = () => {
+    const link = document.querySelector("link[rel~='icon']");
+    if (link) {
+      link.href = '/favicon.png?v=' + Date.now();
+    }
+  };
+  setFavicon();
+
   // Preload critical images after a short delay to not block rendering
   setTimeout(() => {
     preloadCriticalImages().then(({ successful, failed }) => {
