@@ -572,51 +572,7 @@ const OrderSummary = () => {
             </div>
           </div>
 
-          {/* Payment Gateway Selection */}
-          <div className="mb-4 md:mb-6 pt-4 border-t border-gray-200">
-            <h4 className="text-base md:text-lg font-bold text-black mb-3 md:mb-4">
-              Select Payment Gateway
-            </h4>
-            <div className="grid grid-cols-2 gap-3">
-              {/* Razorpay Option */}
-              <button
-                onClick={() => setPaymentGateway('razorpay')}
-                className={`p-3 md:p-4 rounded-lg border-2 transition-all duration-300 ${paymentGateway === 'razorpay'
-                  ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                  : 'border-gray-200 hover:border-gray-300'
-                  }`}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentGateway === 'razorpay' ? 'border-[#D4AF37]' : 'border-gray-400'
-                    }`}>
-                    {paymentGateway === 'razorpay' && (
-                      <div className="w-3 h-3 rounded-full bg-[#D4AF37]"></div>
-                    )}
-                  </div>
-                  <span className="text-black font-semibold text-sm md:text-base">Razorpay</span>
-                </div>
-              </button>
 
-              {/* Cashfree Option */}
-              <button
-                onClick={() => setPaymentGateway('cashfree')}
-                className={`p-3 md:p-4 rounded-lg border-2 transition-all duration-300 ${paymentGateway === 'cashfree'
-                  ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                  : 'border-gray-200 hover:border-gray-300'
-                  }`}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentGateway === 'cashfree' ? 'border-[#D4AF37]' : 'border-gray-400'
-                    }`}>
-                    {paymentGateway === 'cashfree' && (
-                      <div className="w-3 h-3 rounded-full bg-[#D4AF37]"></div>
-                    )}
-                  </div>
-                  <span className="text-black font-semibold text-sm md:text-base">Cashfree</span>
-                </div>
-              </button>
-            </div>
-          </div>
 
           {/* Payment Button */}
           <button
