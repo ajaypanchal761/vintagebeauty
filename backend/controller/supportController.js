@@ -160,7 +160,7 @@ exports.addQueryResponse = async (req, res, next) => {
       message,
       sender: 'admin',
       senderName: senderName || 'Admin',
-      senderEmail: senderEmail || 'admin@vintagebeauty.com',
+      senderEmail: senderEmail || 'info@vintagebeauty.co.in',
       isAdmin: true
     };
 
@@ -205,7 +205,7 @@ exports.addTicketMessage = async (req, res, next) => {
       message,
       sender: 'admin',
       senderName: senderName || 'Admin',
-      senderEmail: senderEmail || 'admin@vintagebeauty.com',
+      senderEmail: senderEmail || 'info@vintagebeauty.co.in',
       isAdmin: true
     };
 
@@ -319,7 +319,7 @@ exports.deleteSupportItem = async (req, res, next) => {
 exports.getMySupport = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    
+
     const supportItems = await Support.find({ userId })
       .sort({ createdAt: -1 })
       .select('-__v');

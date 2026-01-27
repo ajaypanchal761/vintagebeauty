@@ -90,10 +90,10 @@ const Footer = () => {
               <p>
                 Email:{' '}
                 <a
-                  href="mailto:beautyvintage63@gmail.com"
+                  href="mailto:info@vintagebeauty.co.in"
                   className="text-[#D4AF37] hover:underline"
                 >
-                  beautyvintage63@gmail.com
+                  info@vintagebeauty.co.in
                 </a>
               </p>
               <p className="text-[11px] md:text-xs text-gray-500">
@@ -127,7 +127,7 @@ const Footer = () => {
                   <p>Janakpurdham-7, Janakinagar, Dhanusha, Nepal</p>
                   <p>Telephone number: <span className="text-[#D4AF37]">041591376</span></p>
                   <p>Mobile number: <span className="text-[#D4AF37]">9854050076</span></p>
-                  
+
                 </div>
               </div>
             </div>
