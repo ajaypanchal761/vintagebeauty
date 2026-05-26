@@ -120,7 +120,7 @@ const Footer = () => {
               </div>
 
               {/* Nepal Address */}
-              <div>
+              {/* <div>
                 <h5 className="font-medium text-[#D4AF37] mb-1">Nepal</h5>
                 <div className="space-y-0.5">
                   <p className="font-medium">J.P. Marketing Groups</p>
@@ -129,7 +129,7 @@ const Footer = () => {
                   <p>Mobile number: <span className="text-[#D4AF37]">9854050076</span></p>
 
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
